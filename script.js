@@ -1,0 +1,290 @@
+// script.js — behavior for the 60-day French tracker
+// No build step, no dependencies. Open index.html directly or serve via GitHub Pages.
+
+const STORAGE_KEYS = {
+  currentDay: "fft_currentDay",
+  completedDays: "fft_completedDays",
+  checklistPrefix: "fft_checklist_"
+};
+
+let frenchVoice = null;
+
+/* ---------- Text-to-speech ---------- */
+
+function loadFrenchVoice() {
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  frenchVoice =
+    voices.find(v => v.lang === "fr-FR") ||
+    voices.find(v => v.lang && v.lang.startsWith("fr")) ||
+    null;
+}
+
+if (window.speechSynthesis) {
+  loadFrenchVoice();
+  window.speechSynthesis.onvoiceschanged = loadFrenchVoice;
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) {
+    alert("La synthèse vocale n'est pas disponible dans ce navigateur.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const cleanText = text.replace(/\([^)]*\)/g, "").split("/")[0].trim();
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.lang = "fr-FR";
+  if (frenchVoice) utterance.voice = frenchVoice;
+  utterance.rate = 0.92;
+  window.speechSynthesis.speak(utterance);
+}
+
+/* ---------- State ---------- */
+
+function getCurrentDay() {
+  return parseInt(localStorage.getItem(STORAGE_KEYS.currentDay) || "1", 10);
+}
+
+function setCurrentDay(day) {
+  const clamped = Math.min(60, Math.max(1, day));
+  localStorage.setItem(STORAGE_KEYS.currentDay, String(clamped));
+  return clamped;
+}
+
+function getCompletedDays() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(STORAGE_KEYS.completedDays) || "[]"));
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function saveCompletedDays(set) {
+  localStorage.setItem(STORAGE_KEYS.completedDays, JSON.stringify(Array.from(set)));
+}
+
+function getChecklistState(day) {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.checklistPrefix + day) || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function setChecklistState(day, arr) {
+  localStorage.setItem(STORAGE_KEYS.checklistPrefix + day, JSON.stringify(arr));
+}
+
+function getBlockForDay(day) {
+  return BLOCKS.find(b => day >= b.range[0] && day <= b.range[1]) || BLOCKS[BLOCKS.length - 1];
+}
+
+function computeStreak() {
+  const completed = getCompletedDays();
+  const today = getCurrentDay();
+  let streak = 0;
+  let d = today - 1;
+  while (d >= 1 && completed.has(d)) {
+    streak++;
+    d--;
+  }
+  return streak;
+}
+
+/* ---------- Rendering: Today ---------- */
+
+function renderToday() {
+  const day = getCurrentDay();
+  const block = getBlockForDay(day);
+  const promptIndex = (day - block.range[0]) % block.prompts.length;
+  const prompt = block.prompts[promptIndex];
+
+  document.getElementById("day-stamp").textContent = `Jour ${day}`;
+  document.getElementById("block-title").textContent = block.title;
+  document.getElementById("block-grammar").textContent = block.grammar;
+  document.getElementById("block-vocab").textContent = block.vocabFocus;
+  document.getElementById("today-prompt").textContent = prompt;
+  document.getElementById("streak-number").textContent = computeStreak();
+  document.getElementById("jump-input").value = day;
+
+  const checklistEl = document.getElementById("session-checklist");
+  const savedState = getChecklistState(day);
+  checklistEl.innerHTML = "";
+  SESSION_TEMPLATE.forEach((step, i) => {
+    const li = document.createElement("li");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!savedState[i];
+    checkbox.addEventListener("change", () => {
+      const state = getChecklistState(day);
+      state[i] = checkbox.checked;
+      setChecklistState(day, state);
+    });
+    const span = document.createElement("span");
+    span.textContent = step;
+    li.appendChild(checkbox);
+    li.appendChild(span);
+    checklistEl.appendChild(li);
+  });
+
+  document.getElementById("speak-prompt").onclick = () => speak(prompt);
+}
+
+/* ---------- Rendering: Vocabulary ---------- */
+
+function renderVocab() {
+  const container = document.getElementById("vocab-list");
+  container.innerHTML = "";
+  Object.entries(VOCAB).forEach(([category, words]) => {
+    const block = document.createElement("div");
+    block.className = "category-block";
+    const h3 = document.createElement("h3");
+    h3.textContent = category;
+    block.appendChild(h3);
+
+    words.forEach(([fr, en]) => {
+      const row = document.createElement("div");
+      row.className = "word-row";
+      const left = document.createElement("div");
+      left.className = "word-left";
+      left.innerHTML = `<span class="word-fr">${fr}</span><span class="word-en">${en}</span>`;
+      const btn = document.createElement("button");
+      btn.className = "speak-btn";
+      btn.textContent = "🔊";
+      btn.setAttribute("aria-label", `Écouter ${fr}`);
+      btn.onclick = () => speak(fr);
+      row.appendChild(left);
+      row.appendChild(btn);
+      block.appendChild(row);
+    });
+    container.appendChild(block);
+  });
+}
+
+/* ---------- Rendering: Phrases ---------- */
+
+function renderPhrases() {
+  const container = document.getElementById("phrases-list");
+  container.innerHTML = "";
+  CHUNKS.forEach(([fr, en]) => {
+    const row = document.createElement("div");
+    row.className = "word-row";
+    const left = document.createElement("div");
+    left.className = "word-left";
+    left.innerHTML = `<span class="word-fr">${fr}</span><span class="word-en">${en}</span>`;
+    const btn = document.createElement("button");
+    btn.className = "speak-btn";
+    btn.textContent = "🔊";
+    btn.setAttribute("aria-label", `Écouter ${fr}`);
+    btn.onclick = () => speak(fr);
+    row.appendChild(left);
+    row.appendChild(btn);
+    container.appendChild(row);
+  });
+}
+
+/* ---------- Rendering: Pronunciation ---------- */
+
+function renderPronunciation() {
+  const container = document.getElementById("pronunciation-list");
+  container.innerHTML = "";
+  PRONUNCIATION_PATTERNS.forEach(pattern => {
+    const card = document.createElement("div");
+    card.className = "pattern-card";
+    const h4 = document.createElement("h4");
+    h4.textContent = pattern.name;
+    const p = document.createElement("p");
+    p.textContent = pattern.hint;
+    const examplesWrap = document.createElement("div");
+    examplesWrap.className = "pattern-examples";
+    pattern.examples.forEach(([fr, hint]) => {
+      const chip = document.createElement("div");
+      chip.className = "example-chip";
+      const span = document.createElement("span");
+      span.textContent = `${fr} — ${hint}`;
+      const btn = document.createElement("button");
+      btn.textContent = "🔊";
+      btn.setAttribute("aria-label", `Écouter ${fr}`);
+      btn.onclick = () => speak(fr);
+      chip.appendChild(span);
+      chip.appendChild(btn);
+      examplesWrap.appendChild(chip);
+    });
+    card.appendChild(h4);
+    card.appendChild(p);
+    card.appendChild(examplesWrap);
+    container.appendChild(card);
+  });
+}
+
+/* ---------- Rendering: Progress ---------- */
+
+function renderProgress() {
+  const grid = document.getElementById("grid-60");
+  grid.innerHTML = "";
+  const completed = getCompletedDays();
+  const current = getCurrentDay();
+
+  for (let d = 1; d <= 60; d++) {
+    const cell = document.createElement("div");
+    cell.className = "day-cell";
+    if (completed.has(d)) cell.classList.add("done");
+    if (d === current) cell.classList.add("current");
+    cell.textContent = d;
+    cell.title = getBlockForDay(d).title;
+    cell.onclick = () => {
+      const set = getCompletedDays();
+      if (set.has(d)) set.delete(d); else set.add(d);
+      saveCompletedDays(set);
+      renderProgress();
+      renderToday();
+    };
+    grid.appendChild(cell);
+  }
+}
+
+/* ---------- Controls ---------- */
+
+document.getElementById("complete-day-btn").addEventListener("click", () => {
+  const day = getCurrentDay();
+  const set = getCompletedDays();
+  set.add(day);
+  saveCompletedDays(set);
+  setCurrentDay(day + 1);
+  renderToday();
+  renderProgress();
+});
+
+document.getElementById("jump-btn").addEventListener("click", () => {
+  const val = parseInt(document.getElementById("jump-input").value, 10) || 1;
+  setCurrentDay(val);
+  renderToday();
+  renderProgress();
+});
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  if (!confirm("Réinitialiser toute la progression ? Cette action est irréversible.")) return;
+  Object.keys(localStorage)
+    .filter(k => k.startsWith("fft_"))
+    .forEach(k => localStorage.removeItem(k));
+  renderToday();
+  renderProgress();
+});
+
+/* ---------- Tabs ---------- */
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tab).classList.add("active");
+  });
+});
+
+/* ---------- Init ---------- */
+
+renderToday();
+renderVocab();
+renderPhrases();
+renderPronunciation();
+renderProgress();

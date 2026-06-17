@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carnet — 60 jours de français</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,72,400;0,72,600;1,72,500&family=Inter:wght@400;500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="notebook">
+  <div class="margin-rule"></div>
+
+  <header class="page-header">
+    <p class="eyebrow">carnet de bord</p>
+    <h1>60 jours de français</h1>
+    <p class="subtitle">Pour parler en famille — pas pour un examen.</p>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="today">Aujourd'hui</button>
+    <button class="tab" data-tab="vocab">Vocabulaire</button>
+    <button class="tab" data-tab="phrases">Phrases</button>
+    <button class="tab" data-tab="pronunciation">Prononciation</button>
+    <button class="tab" data-tab="progress">Progrès</button>
+  </nav>
+
+  <main>
+
+    <section id="today" class="panel active">
+      <div class="stamp" id="day-stamp">Jour 1</div>
+      <div class="today-grid">
+        <div class="today-main">
+          <h2 id="block-title">—</h2>
+          <p class="meta"><strong>Grammaire :</strong> <span id="block-grammar"></span></p>
+          <p class="meta"><strong>Vocabulaire :</strong> <span id="block-vocab"></span></p>
+
+          <div class="prompt-box">
+            <p class="prompt-label">Aujourd'hui, tu parles de…</p>
+            <p class="prompt-text" id="today-prompt"></p>
+            <button class="speak-btn small" id="speak-prompt">🔊 écouter</button>
+          </div>
+
+          <h3>Séance du jour (20–28 min)</h3>
+          <ul class="checklist" id="session-checklist"></ul>
+
+          <div class="day-controls">
+            <button class="primary-btn" id="complete-day-btn">Marquer le jour terminé →</button>
+            <div class="day-jump">
+              <label for="jump-input">Aller au jour</label>
+              <input type="number" id="jump-input" min="1" max="60" value="1">
+              <button id="jump-btn">OK</button>
+            </div>
+          </div>
+        </div>
+        <div class="today-side">
+          <p class="side-label">Série actuelle</p>
+          <p class="streak-number" id="streak-number">0</p>
+          <p class="side-sub">jours d'affilée</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="vocab" class="panel">
+      <h2>Les ~270 mots du cœur</h2>
+      <p class="intro-text">Organisés par fonction, pas par fréquence brute. Clique le haut-parleur pour entendre la prononciation.</p>
+      <div id="vocab-list"></div>
+    </section>
+
+    <section id="phrases" class="panel">
+      <h2>40 formules à retenir en bloc</h2>
+      <p class="intro-text">Ne les conjugue pas dans ta tête — apprends-les comme des mots entiers.</p>
+      <div id="phrases-list" class="card-list"></div>
+    </section>
+
+    <section id="pronunciation" class="panel">
+      <h2>Les sons qui posent problème</h2>
+      <p class="intro-text">Un schéma de prononciation à la fois, valable pour tous les mots qui suivent ce patron.</p>
+      <div id="pronunciation-list"></div>
+    </section>
+
+    <section id="progress" class="panel">
+      <h2>Les 60 jours</h2>
+      <div class="grid-60" id="grid-60"></div>
+      <button class="reset-btn" id="reset-btn">Réinitialiser la progression</button>
+    </section>
+
+  </main>
+
+  <footer class="page-footer">
+    <p>Pas de connexion nécessaire — tout est stocké dans ton navigateur.</p>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
