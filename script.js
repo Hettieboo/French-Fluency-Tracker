@@ -4,7 +4,8 @@
 const STORAGE_KEYS = {
   currentDay: "fft_currentDay",
   completedDays: "fft_completedDays",
-  checklistPrefix: "fft_checklist_"
+  checklistPrefix: "fft_checklist_",
+  notesPrefix: "fft_notes_"
 };
 
 let frenchVoice = null;
@@ -74,6 +75,14 @@ function setChecklistState(day, arr) {
   localStorage.setItem(STORAGE_KEYS.checklistPrefix + day, JSON.stringify(arr));
 }
 
+function getNotes(day) {
+  return localStorage.getItem(STORAGE_KEYS.notesPrefix + day) || "";
+}
+
+function setNotes(day, text) {
+  localStorage.setItem(STORAGE_KEYS.notesPrefix + day, text);
+}
+
 function getBlockForDay(day) {
   return BLOCKS.find(b => day >= b.range[0] && day <= b.range[1]) || BLOCKS[BLOCKS.length - 1];
 }
@@ -95,16 +104,66 @@ function computeStreak() {
 function renderToday() {
   const day = getCurrentDay();
   const block = getBlockForDay(day);
-  const promptIndex = (day - block.range[0]) % block.prompts.length;
-  const prompt = block.prompts[promptIndex];
+  const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, tables: [], prompt: block.prompts[0] };
+  const prompt = detail.prompt;
 
   document.getElementById("day-stamp").textContent = `Jour ${day}`;
-  document.getElementById("block-title").textContent = block.title;
-  document.getElementById("block-grammar").textContent = block.grammar;
-  document.getElementById("block-vocab").textContent = block.vocabFocus;
+  document.getElementById("block-title").textContent = `${block.title} (jours ${block.range[0]}–${block.range[1]})`;
+  document.getElementById("block-grammar").textContent = detail.grammar;
+  document.getElementById("block-vocab").textContent = detail.vocab;
   document.getElementById("today-prompt").textContent = prompt;
   document.getElementById("streak-number").textContent = computeStreak();
   document.getElementById("jump-input").value = day;
+
+  const tablesEl = document.getElementById("conjugation-tables");
+  tablesEl.innerHTML = "";
+  (detail.tables || []).forEach(table => {
+    const card = document.createElement("div");
+    card.className = "conj-table";
+    const h4 = document.createElement("h4");
+    h4.textContent = table.title;
+    card.appendChild(h4);
+    const tableEl = document.createElement("table");
+    table.rows.forEach(([pronoun, form]) => {
+      const tr = document.createElement("tr");
+      const tdP = document.createElement("td");
+      tdP.className = "conj-pronoun";
+      tdP.textContent = pronoun;
+      const tdF = document.createElement("td");
+      tdF.className = "conj-form";
+      tdF.textContent = form;
+      const tdBtn = document.createElement("td");
+      const btn = document.createElement("button");
+      btn.className = "speak-btn";
+      btn.textContent = "🔊";
+      btn.setAttribute("aria-label", `Écouter ${pronoun} ${form}`);
+      btn.onclick = () => {
+        const cleanPronoun = pronoun.split("/")[0].replace(/[()→]/g, "").trim();
+        let phrase;
+        if (!cleanPronoun) phrase = form;
+        else if (cleanPronoun.endsWith("'")) phrase = cleanPronoun + form;
+        else phrase = `${cleanPronoun} ${form}`;
+        speak(phrase);
+      };
+      tdBtn.appendChild(btn);
+      tr.appendChild(tdP);
+      tr.appendChild(tdF);
+      tr.appendChild(tdBtn);
+      tableEl.appendChild(tr);
+    });
+    card.appendChild(tableEl);
+    if (table.note) {
+      const note = document.createElement("p");
+      note.className = "conj-note";
+      note.textContent = table.note;
+      card.appendChild(note);
+    }
+    tablesEl.appendChild(card);
+  });
+
+  const notesEl = document.getElementById("day-notes");
+  notesEl.value = getNotes(day);
+  notesEl.oninput = () => setNotes(day, notesEl.value);
 
   const checklistEl = document.getElementById("session-checklist");
   const savedState = getChecklistState(day);
