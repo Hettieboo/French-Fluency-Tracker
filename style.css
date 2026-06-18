@@ -183,6 +183,28 @@ h3 {
   margin: 18px 0;
 }
 
+/* ===== Conjugation tables ===== */
+.conj-table {
+  background: white;
+  border: 1px solid var(--grid-line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+.conj-table h4 {
+  font-family: 'Caveat', cursive;
+  font-size: 19px;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+.conj-table table { width: 100%; border-collapse: collapse; }
+.conj-table tr { border-bottom: 1px dashed var(--grid-line); }
+.conj-table tr:last-child { border-bottom: none; }
+.conj-pronoun { padding: 6px 8px 6px 0; color: var(--ink-soft); font-size: 14px; width: 40%; }
+.conj-form { padding: 6px 8px; font-weight: 600; font-size: 14.5px; }
+.conj-table .speak-btn { width: 28px; height: 28px; font-size: 12px; }
+.conj-note { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; font-style: italic; }
+
 .prompt-label {
   font-family: 'Caveat', cursive;
   font-size: 18px;
@@ -202,6 +224,29 @@ h3 {
   font-size: 14px;
 }
 .checklist li input { margin-top: 3px; accent-color: var(--accent); }
+
+.notes-pad {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  color: var(--ink);
+  border: 1px solid var(--grid-line);
+  border-radius: var(--radius);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 23px,
+      var(--grid-line) 23px,
+      var(--grid-line) 24px
+    ),
+    white;
+  line-height: 24px;
+  resize: vertical;
+}
+.notes-pad:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .day-controls {
   margin-top: 24px;
