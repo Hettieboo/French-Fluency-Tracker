@@ -99,30 +99,78 @@ function computeStreak() {
   return streak;
 }
 
+/* ---------- Helpers ---------- */
+
+// Look up a VOCAB entry by its French headword (exact match against the fr
+// column across all categories). Returns [fr, en] or null if not found.
+function findVocabEntry(frTerm) {
+  for (const words of Object.values(VOCAB)) {
+    const hit = words.find(([fr]) => fr === frTerm);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function updateChecklistProgress(day) {
+  const state = getChecklistState(day);
+  const total = SESSION_TEMPLATE.length;
+  const done = state.filter(Boolean).length;
+  const el = document.getElementById("checklist-progress");
+  el.textContent = `${done}/${total}`;
+  el.classList.toggle("complete", done === total);
+}
+
 /* ---------- Rendering: Today ---------- */
 
 function renderToday() {
   const day = getCurrentDay();
   const block = getBlockForDay(day);
-  const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, tables: [], prompt: block.prompts[0] };
+  const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, vocabWords: [], tables: [], prompt: block.prompts[0] };
   const prompt = detail.prompt;
 
   document.getElementById("day-stamp").textContent = `Jour ${day}`;
   document.getElementById("block-title").textContent = `${block.title} (jours ${block.range[0]}–${block.range[1]})`;
   document.getElementById("block-grammar").textContent = detail.grammar;
-  document.getElementById("block-vocab").textContent = detail.vocab;
   document.getElementById("today-prompt").textContent = prompt;
   document.getElementById("streak-number").textContent = computeStreak();
   document.getElementById("jump-input").value = day;
+  document.getElementById("today-main").style.setProperty("--block-color", block.color || "#2c5f8a");
 
+  // Today's focus vocab, as chips above the conjugation tables.
+  const chipsEl = document.getElementById("today-vocab-chips");
+  chipsEl.innerHTML = "";
+  (detail.vocabWords || []).forEach(frTerm => {
+    const entry = findVocabEntry(frTerm);
+    if (!entry) return;
+    const [fr, en] = entry;
+    const chip = document.createElement("div");
+    chip.className = "vocab-chip";
+    chip.innerHTML = `<span class="chip-fr">${fr}</span><span class="chip-en">${en}</span>`;
+    const btn = document.createElement("button");
+    btn.textContent = "🔊";
+    btn.setAttribute("aria-label", `Écouter ${fr}`);
+    btn.onclick = () => speak(fr);
+    chip.appendChild(btn);
+    chipsEl.appendChild(chip);
+  });
+
+  // Conjugation tables — collapsible <details>, closed by default on heavy
+  // review days so the page doesn't open as a wall of grids.
+  const isReviewDay = REVIEW_DAYS.includes(day);
   const tablesEl = document.getElementById("conjugation-tables");
   tablesEl.innerHTML = "";
   (detail.tables || []).forEach(table => {
-    const card = document.createElement("div");
-    card.className = "conj-table";
-    const h4 = document.createElement("h4");
-    h4.textContent = table.title;
-    card.appendChild(h4);
+    const details = document.createElement("details");
+    details.className = "conj-table";
+    if (!isReviewDay) details.setAttribute("open", "");
+
+    const summary = document.createElement("summary");
+    summary.textContent = table.title;
+    details.appendChild(summary);
+
+    const body = document.createElement("div");
+    body.className = "conj-table-body";
+
     const tableEl = document.createElement("table");
     table.rows.forEach(([pronoun, form]) => {
       const tr = document.createElement("tr");
@@ -151,14 +199,17 @@ function renderToday() {
       tr.appendChild(tdBtn);
       tableEl.appendChild(tr);
     });
-    card.appendChild(tableEl);
+    body.appendChild(tableEl);
+
     if (table.note) {
       const note = document.createElement("p");
       note.className = "conj-note";
       note.textContent = table.note;
-      card.appendChild(note);
+      body.appendChild(note);
     }
-    tablesEl.appendChild(card);
+
+    details.appendChild(body);
+    tablesEl.appendChild(details);
   });
 
   const notesEl = document.getElementById("day-notes");
@@ -170,6 +221,7 @@ function renderToday() {
   checklistEl.innerHTML = "";
   SESSION_TEMPLATE.forEach((step, i) => {
     const li = document.createElement("li");
+    if (savedState[i]) li.classList.add("step-done");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = !!savedState[i];
@@ -177,6 +229,8 @@ function renderToday() {
       const state = getChecklistState(day);
       state[i] = checkbox.checked;
       setChecklistState(day, state);
+      li.classList.toggle("step-done", checkbox.checked);
+      updateChecklistProgress(day);
     });
     const span = document.createElement("span");
     span.textContent = step;
@@ -184,6 +238,7 @@ function renderToday() {
     li.appendChild(span);
     checklistEl.appendChild(li);
   });
+  updateChecklistProgress(day);
 
   document.getElementById("speak-prompt").onclick = () => speak(prompt);
 }
