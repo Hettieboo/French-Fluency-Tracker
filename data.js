@@ -174,9 +174,12 @@ const PRONUNCIATION_PATTERNS = [
   }
 ];
 
+// Each block now carries a `color` token used for the per-block colour band
+// in the UI (left border on the day header + progress grid legend).
 const BLOCKS = [
   {
     range: [1, 10],
+    color: "#5B8DB8",
     title: "Présent — fondations",
     grammar: "Présent: être, avoir, faire, aller, pouvoir, vouloir + regular -er pattern",
     vocabFocus: "Pronoms, famille, émotions de base",
@@ -190,6 +193,7 @@ const BLOCKS = [
   },
   {
     range: [11, 20],
+    color: "#5B8DB8",
     title: "Présent — maîtrise",
     grammar: "Ajout: savoir, venir, voir, prendre, dire, mettre, connaître, il faut",
     vocabFocus: "Temps/quantité, opinions, descripteurs",
@@ -202,6 +206,7 @@ const BLOCKS = [
   },
   {
     range: [21, 35],
+    color: "#C17D3C",
     title: "Passé composé — raconter ce qui s'est passé",
     grammar: "Passé composé avec avoir, puis les verbes avec être (aller, venir, arriver, partir, rester, sortir)",
     vocabFocus: "Vie quotidienne, connecteurs de récit (puis, ensuite, alors)",
@@ -214,6 +219,7 @@ const BLOCKS = [
   },
   {
     range: [36, 50],
+    color: "#4F7942",
     title: "Futur proche & impératif",
     grammar: "aller + infinitif, impératif, venir de + infinitif",
     vocabFocus: "Projets, demandes, affection",
@@ -226,6 +232,7 @@ const BLOCKS = [
   },
   {
     range: [51, 55],
+    color: "#9B6B9B",
     title: "Conditionnel — formules d'adoucissement",
     grammar: "je voudrais, tu pourrais, j'aimerais, ça serait (phrases figées, pas de tableau complet)",
     vocabFocus: "Désaccord, réparation (ce n'est pas grave, on peut en parler)",
@@ -236,6 +243,7 @@ const BLOCKS = [
   },
   {
     range: [56, 60],
+    color: "#c0392b",
     title: "Consolidation & vraie conversation",
     grammar: "Aucune nouvelle structure — intégration de tout",
     vocabFocus: "Tout le vocabulaire des blocs précédents",
@@ -273,77 +281,84 @@ const CONJUGATIONS = {
 // the whole 10/15/5-day phase. renderToday() in script.js uses this, not block.grammar.
 // "tables" lists which conjugation tables to show; "prompt" only uses verbs already
 // taught by that day, so the example sentence always matches what's been introduced.
+// "vocabWords" lists the French headwords (must match VOCAB entries exactly) that are
+// THIS day's specific focus — rendered as a small chip row above the prompt, separate
+// from the full vocab browser in the Vocabulaire tab.
 const DAY_DETAILS = {
-  1: { grammar: "être (au présent)", vocab: "Pronoms sujets : je, tu, il, elle, on, nous, vous, ils, elles", tables: [CONJUGATIONS.etre], prompt: "Dis trois phrases avec être : « Je suis... », « Tu es... », « Il/elle est... ». Par exemple : « Je suis content(e) aujourd'hui. »" },
-  2: { grammar: "avoir (au présent)", vocab: "Pronoms compléments (moi, toi, lui) + possessifs (mon/ma/mes, ton/ta/tes)", tables: [CONJUGATIONS.avoir], prompt: "Dis trois phrases avec avoir : « J'ai... », « Tu as... », « Il/elle a... ». Par exemple : « J'ai un frère. »" },
-  3: { grammar: "Révision : être + avoir ensemble", vocab: "Possessifs (son/sa/ses, notre, votre, leur)", tables: [CONJUGATIONS.etre, CONJUGATIONS.avoir], prompt: "Combine être et avoir dans une seule phrase, par exemple : « Je suis fatigué(e) et j'ai faim. » Essaie avec ta propre situation." },
-  4: { grammar: "faire (au présent)", vocab: "Famille proche : maman, papa, frère, sœur, fils, fille", tables: [CONJUGATIONS.faire], prompt: "Dis ce que tu fais en ce moment avec faire : « Je fais... », « Tu fais... », « Il/elle fait... »." },
-  5: { grammar: "aller (au présent)", vocab: "Famille : mari, femme, copain, copine, enfant, bébé", tables: [CONJUGATIONS.aller], prompt: "Dis où tu vas avec aller : « Je vais... », « Tu vas... », « Il/elle va... »." },
-  6: { grammar: "Révision : faire + aller", vocab: "Belle-famille : beau-père, belle-mère, beau-frère, belle-sœur, grands-parents", tables: [CONJUGATIONS.faire, CONJUGATIONS.aller], prompt: "Réponds : « Qu'est-ce que tu fais ce soir ? Où est-ce que tu vas après ? » (utilise faire et aller)." },
-  7: { grammar: "pouvoir (au présent)", vocab: "Émotions de base : content(e), heureux/heureuse, triste, fâché(e)", tables: [CONJUGATIONS.pouvoir], prompt: "Dis ce que tu peux faire avec pouvoir : « Je peux... », « Tu peux... », « Il/elle peut... »." },
-  8: { grammar: "vouloir (au présent)", vocab: "Émotions : fatigué(e), stressé(e), surpris(e), fier/fière, gêné(e)", tables: [CONJUGATIONS.vouloir], prompt: "Dis ce que tu veux faire avec vouloir : « Je veux... », « Tu veux... », « Il/elle veut... »." },
-  9: { grammar: "Révision pouvoir + vouloir, et le patron régulier des verbes en -er", vocab: "d'accord, pas d'accord, peut-être, vraiment", tables: [CONJUGATIONS.pouvoir, CONJUGATIONS.vouloir, CONJUGATIONS.parlerEr], prompt: "Utilise pouvoir, vouloir et un verbe en -er (comme parler) dans une phrase : « Je veux parler français » ou « Tu peux regarder ça ? »." },
-  10: { grammar: "Révision complète du bloc : être, avoir, faire, aller, pouvoir, vouloir + verbes en -er", vocab: "Révision de tout le vocabulaire des jours 1 à 9", tables: [CONJUGATIONS.etre, CONJUGATIONS.avoir, CONJUGATIONS.faire, CONJUGATIONS.aller, CONJUGATIONS.pouvoir, CONJUGATIONS.vouloir], prompt: "Enregistre un mini-monologue d'une minute en utilisant être, avoir, faire, aller, pouvoir et vouloir." },
+  1: { grammar: "être (au présent)", vocab: "Pronoms sujets : je, tu, il, elle, on, nous, vous, ils, elles", vocabWords: ["je", "tu", "il", "elle", "on", "nous", "vous"], tables: [CONJUGATIONS.etre], prompt: "Dis trois phrases avec être : « Je suis... », « Tu es... », « Il/elle est... ». Par exemple : « Je suis content(e) aujourd'hui. »" },
+  2: { grammar: "avoir (au présent)", vocab: "Pronoms compléments (moi, toi, lui) + possessifs (mon/ma/mes, ton/ta/tes)", vocabWords: ["moi", "toi", "lui", "mon/ma/mes", "ton/ta/tes"], tables: [CONJUGATIONS.avoir], prompt: "Dis trois phrases avec avoir : « J'ai... », « Tu as... », « Il/elle a... ». Par exemple : « J'ai un frère. »" },
+  3: { grammar: "Révision : être + avoir ensemble", vocab: "Possessifs (son/sa/ses, notre, votre, leur)", vocabWords: ["son/sa/ses", "notre", "votre", "leur"], tables: [CONJUGATIONS.etre, CONJUGATIONS.avoir], prompt: "Combine être et avoir dans une seule phrase, par exemple : « Je suis fatigué(e) et j'ai faim. » Essaie avec ta propre situation." },
+  4: { grammar: "faire (au présent)", vocab: "Famille proche : maman, papa, frère, sœur, fils, fille", vocabWords: ["maman", "papa", "frère", "sœur", "fils", "fille"], tables: [CONJUGATIONS.faire], prompt: "Dis ce que tu fais en ce moment avec faire : « Je fais... », « Tu fais... », « Il/elle fait... »." },
+  5: { grammar: "aller (au présent)", vocab: "Famille : mari, femme, copain, copine, enfant, bébé", vocabWords: ["mari", "femme", "copain/copine", "enfant", "bébé"], tables: [CONJUGATIONS.aller], prompt: "Dis où tu vas avec aller : « Je vais... », « Tu vas... », « Il/elle va... »." },
+  6: { grammar: "Révision : faire + aller", vocab: "Belle-famille : beau-père, belle-mère, beau-frère, belle-sœur, grands-parents", vocabWords: ["beau-père/belle-mère", "beau-frère/belle-sœur", "grands-parents"], tables: [CONJUGATIONS.faire, CONJUGATIONS.aller], prompt: "Réponds : « Qu'est-ce que tu fais ce soir ? Où est-ce que tu vas après ? » (utilise faire et aller)." },
+  7: { grammar: "pouvoir (au présent)", vocab: "Émotions de base : content(e), heureux/heureuse, triste, fâché(e)", vocabWords: ["content(e)", "heureux/heureuse", "triste", "fâché(e)"], tables: [CONJUGATIONS.pouvoir], prompt: "Dis ce que tu peux faire avec pouvoir : « Je peux... », « Tu peux... », « Il/elle peut... »." },
+  8: { grammar: "vouloir (au présent)", vocab: "Émotions : fatigué(e), stressé(e), surpris(e), fier/fière, gêné(e)", vocabWords: ["fatigué(e)", "stressé(e)", "surpris(e)", "fier/fière", "gêné(e)"], tables: [CONJUGATIONS.vouloir], prompt: "Dis ce que tu veux faire avec vouloir : « Je veux... », « Tu veux... », « Il/elle veut... »." },
+  9: { grammar: "Révision pouvoir + vouloir, et le patron régulier des verbes en -er", vocab: "d'accord, pas d'accord, peut-être, vraiment", vocabWords: ["d'accord", "pas d'accord", "peut-être", "vraiment"], tables: [CONJUGATIONS.pouvoir, CONJUGATIONS.vouloir, CONJUGATIONS.parlerEr], prompt: "Utilise pouvoir, vouloir et un verbe en -er (comme parler) dans une phrase : « Je veux parler français » ou « Tu peux regarder ça ? »." },
+  10: { grammar: "Révision complète du bloc : être, avoir, faire, aller, pouvoir, vouloir + verbes en -er", vocab: "Révision de tout le vocabulaire des jours 1 à 9", vocabWords: [], tables: [CONJUGATIONS.etre, CONJUGATIONS.avoir, CONJUGATIONS.faire, CONJUGATIONS.aller, CONJUGATIONS.pouvoir, CONJUGATIONS.vouloir], prompt: "Enregistre un mini-monologue d'une minute en utilisant être, avoir, faire, aller, pouvoir et vouloir." },
 
-  11: { grammar: "savoir (au présent)", vocab: "Temps : aujourd'hui, hier, demain, maintenant", tables: [CONJUGATIONS.savoir], prompt: "Dis ce que tu sais faire avec savoir : « Je sais... », « Tu sais... », « Il/elle sait... »." },
-  12: { grammar: "venir (au présent)", vocab: "Fréquence : toujours, jamais, souvent, parfois, déjà, encore", tables: [CONJUGATIONS.venir], prompt: "Dis d'où tu viens avec venir : « Je viens... », « Tu viens... », « Il/elle vient... »." },
-  13: { grammar: "Révision savoir + venir", vocab: "Quantité : beaucoup, un peu, assez, trop", tables: [CONJUGATIONS.savoir, CONJUGATIONS.venir], prompt: "Combine savoir et venir dans deux phrases sur ta semaine." },
-  14: { grammar: "voir (au présent)", vocab: "Quantité : peu, plus, moins, tout/tous/toute/toutes, rien", tables: [CONJUGATIONS.voir], prompt: "Dis qui tu vois avec voir : « Je vois... », « Tu vois... », « Il/elle voit... »." },
-  15: { grammar: "prendre (au présent)", vocab: "Opinions : penser que, croire que, trouver que", tables: [CONJUGATIONS.prendre], prompt: "Dis ce que tu prends avec prendre : « Je prends... », « Tu prends... », « Il/elle prend... ». Par exemple : « Je prends un café. »" },
-  16: { grammar: "Révision voir + prendre", vocab: "avoir envie de, avoir besoin de, avoir peur de, avoir hâte de, espérer", tables: [CONJUGATIONS.voir, CONJUGATIONS.prendre], prompt: "Réponds : « Qu'est-ce que tu prends d'habitude le matin ? Qui est-ce que tu vois cette semaine ? »" },
-  17: { grammar: "dire (au présent)", vocab: "Descripteurs : bon/bonne, mauvais(e), grand(e), petit(e), beau/belle", tables: [CONJUGATIONS.dire], prompt: "Dis ce que tu dis souvent avec dire : « Je dis... », « Tu dis... », « Il/elle dit... »." },
-  18: { grammar: "mettre (au présent)", vocab: "Descripteurs : gentil(le), drôle, sympa, difficile, facile, important(e)", tables: [CONJUGATIONS.mettre], prompt: "Dis ce que tu mets avec mettre : « Je mets... », « Tu mets... », « Il/elle met... »." },
-  19: { grammar: "connaître (au présent) + il faut (phrase figée, pas encore le subjonctif complet)", vocab: "Descripteurs : différent(e), nouveau/nouvelle, vieux/vieille, jeune, occupé(e), libre", tables: [CONJUGATIONS.connaitre, CONJUGATIONS.falloir], prompt: "Dis qui tu connais avec connaître, puis utilise « il faut » dans une phrase figée : « Il faut que je parte » (pas besoin d'analyser sa conjugaison)." },
-  20: { grammar: "Révision complète : savoir, venir, voir, prendre, dire, mettre, connaître, il faut", vocab: "Révision de tout le vocabulaire des jours 11 à 19", tables: [CONJUGATIONS.savoir, CONJUGATIONS.venir, CONJUGATIONS.voir, CONJUGATIONS.prendre, CONJUGATIONS.dire, CONJUGATIONS.mettre, CONJUGATIONS.connaitre], prompt: "Enregistre un monologue de 2 minutes en utilisant tous les verbes des blocs 1 et 2." },
+  11: { grammar: "savoir (au présent)", vocab: "Temps : aujourd'hui, hier, demain, maintenant", vocabWords: ["aujourd'hui", "hier", "demain", "maintenant"], tables: [CONJUGATIONS.savoir], prompt: "Dis ce que tu sais faire avec savoir : « Je sais... », « Tu sais... », « Il/elle sait... »." },
+  12: { grammar: "venir (au présent)", vocab: "Fréquence : toujours, jamais, souvent, parfois, déjà, encore", vocabWords: ["toujours", "jamais", "souvent", "parfois", "déjà", "encore"], tables: [CONJUGATIONS.venir], prompt: "Dis d'où tu viens avec venir : « Je viens... », « Tu viens... », « Il/elle vient... »." },
+  13: { grammar: "Révision savoir + venir", vocab: "Quantité : beaucoup, un peu, assez, trop", vocabWords: ["beaucoup", "un peu", "assez", "trop"], tables: [CONJUGATIONS.savoir, CONJUGATIONS.venir], prompt: "Combine savoir et venir dans deux phrases sur ta semaine." },
+  14: { grammar: "voir (au présent)", vocab: "Quantité : peu, plus, moins, tout/tous/toute/toutes, rien", vocabWords: ["peu", "plus", "moins", "tout/tous/toute/toutes", "rien"], tables: [CONJUGATIONS.voir], prompt: "Dis qui tu vois avec voir : « Je vois... », « Tu vois... », « Il/elle voit... »." },
+  15: { grammar: "prendre (au présent)", vocab: "Opinions : penser que, croire que, trouver que", vocabWords: ["penser que", "croire que", "trouver que"], tables: [CONJUGATIONS.prendre], prompt: "Dis ce que tu prends avec prendre : « Je prends... », « Tu prends... », « Il/elle prend... ». Par exemple : « Je prends un café. »" },
+  16: { grammar: "Révision voir + prendre", vocab: "avoir envie de, avoir besoin de, avoir peur de, avoir hâte de, espérer", vocabWords: ["avoir envie de", "avoir besoin de", "avoir peur de", "avoir hâte de", "espérer"], tables: [CONJUGATIONS.voir, CONJUGATIONS.prendre], prompt: "Réponds : « Qu'est-ce que tu prends d'habitude le matin ? Qui est-ce que tu vois cette semaine ? »" },
+  17: { grammar: "dire (au présent)", vocab: "Descripteurs : bon/bonne, mauvais(e), grand(e), petit(e), beau/belle", vocabWords: ["bon/bonne", "mauvais(e)", "grand(e)", "petit(e)", "beau/belle"], tables: [CONJUGATIONS.dire], prompt: "Dis ce que tu dis souvent avec dire : « Je dis... », « Tu dis... », « Il/elle dit... »." },
+  18: { grammar: "mettre (au présent)", vocab: "Descripteurs : gentil(le), drôle, sympa, difficile, facile, important(e)", vocabWords: ["gentil(le)", "drôle", "sympa", "difficile/facile", "important(e)"], tables: [CONJUGATIONS.mettre], prompt: "Dis ce que tu mets avec mettre : « Je mets... », « Tu mets... », « Il/elle met... »." },
+  19: { grammar: "connaître (au présent) + il faut (phrase figée, pas encore le subjonctif complet)", vocab: "Descripteurs : différent(e), nouveau/nouvelle, vieux/vieille, jeune, occupé(e), libre", vocabWords: ["différent(e)", "nouveau/nouvelle", "vieux/vieille", "jeune", "occupé(e)", "libre"], tables: [CONJUGATIONS.connaitre, CONJUGATIONS.falloir], prompt: "Dis qui tu connais avec connaître, puis utilise « il faut » dans une phrase figée : « Il faut que je parte » (pas besoin d'analyser sa conjugaison)." },
+  20: { grammar: "Révision complète : savoir, venir, voir, prendre, dire, mettre, connaître, il faut", vocab: "Révision de tout le vocabulaire des jours 11 à 19", vocabWords: [], tables: [CONJUGATIONS.savoir, CONJUGATIONS.venir, CONJUGATIONS.voir, CONJUGATIONS.prendre, CONJUGATIONS.dire, CONJUGATIONS.mettre, CONJUGATIONS.connaitre], prompt: "Enregistre un monologue de 2 minutes en utilisant tous les verbes des blocs 1 et 2." },
 
-  21: { grammar: "Passé composé avec avoir — verbes réguliers en -er", vocab: "Maison : maison, appartement, chambre, cuisine, salon", tables: [{ title: "Passé composé = avoir (conjugué) + participe passé", rows: CONJUGATIONS.avoir.rows, note: "Participes en -er : parlé, mangé, regardé, aimé, écouté, travaillé, habité." }], prompt: "Raconte ce que tu as fait aujourd'hui avec des verbes en -er : « J'ai parlé avec... », « J'ai mangé... »." },
-  22: { grammar: "Passé composé avec avoir — participes irréguliers", vocab: "travail, voiture, téléphone, argent, temps", tables: [{ title: "Passé composé = avoir (conjugué) + participe passé", rows: CONJUGATIONS.avoir.rows, note: "Participes irréguliers : fait, eu, pris, mis, dit, vu." }], prompt: "Utilise j'ai fait, j'ai eu, j'ai pris, j'ai mis, j'ai dit ou j'ai vu — choisis-en trois et fais une phrase avec chacun." },
-  23: { grammar: "Révision : poser des questions au passé composé", vocab: "jour, semaine, week-end, matin, soir, nuit", tables: [{ title: "Passé composé = avoir (conjugué) + participe passé", rows: CONJUGATIONS.avoir.rows }], prompt: "Demande à quelqu'un : « Qu'est-ce que tu as fait aujourd'hui ? » et réponds aussi pour toi-même." },
-  24: { grammar: "Verbes avec être au passé composé : aller, venir", vocab: "repas, dîner, déjeuner, courses, faire les courses", tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows, note: "Le participe s'accorde : il est allé / elle est allée." }], prompt: "Raconte où tu es allé(e) et qui est venu te voir récemment : « Je suis allé(e)... », « Il/elle est venu(e)... »." },
-  25: { grammar: "Verbes avec être : arriver, partir", vocab: "ranger, nettoyer, rentrer", tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows, note: "Exemples : je suis arrivé(e), tu es parti(e)." }], prompt: "Raconte à quelle heure tu es arrivé(e) et parti(e) aujourd'hui." },
-  26: { grammar: "Révision : aller, venir, arriver, partir", vocab: "voyage, vacances, rendez-vous, projet", tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows }], prompt: "Raconte ta journée en quatre phrases avec aller, venir, arriver et partir." },
-  27: { grammar: "Verbes avec être : rester, sortir", vocab: "problème, solution", tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows, note: "Exemples : je suis resté(e), tu es sorti(e)." }], prompt: "Dis si tu es resté(e) à la maison ou si tu es sorti(e) ce week-end." },
-  28: { grammar: "Révision complète des verbes avec être — l'accord", vocab: "Révision vie quotidienne", tables: [{ title: "Passé composé avec être — accord", rows: CONJUGATIONS.etre.rows, note: "elle est allée / ils sont sortis / elles sont parties." }], prompt: "Raconte la journée de quelqu'un d'autre (il/elle) — fais attention à l'accord : « elle est allée », « ils sont sortis »." },
-  29: { grammar: "Mélange avoir + être au passé composé", vocab: "Révision vie quotidienne", tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte ta journée en mélangeant avoir et être : « Je suis allé(e) au travail, j'ai mangé, puis je suis rentré(e). »" },
-  30: { grammar: "Connecteurs de récit : puis, ensuite, alors", vocab: "Révision vie quotidienne", tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte ta journée en reliant les phrases avec puis, ensuite, alors." },
-  31: { grammar: "Révision libre du bloc", vocab: "Révision libre", tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Réécoute ta phrase du Jour 21 et améliore-la." },
-  32: { grammar: "Jour de parole : raconte ta journée d'hier en détail", vocab: "Révision libre", tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte ta journée d'hier en détail, à voix haute, une minute minimum." },
-  33: { grammar: "Jour de parole : raconte un événement familial récent", vocab: "Révision libre", tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte un événement familial récent en quatre ou cinq phrases au passé composé." },
-  34: { grammar: "Révision des points faibles identifiés", vocab: "Révision libre", tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Reprends les verbes du passé composé qui te bloquent encore et répète-les trois fois chacun." },
-  35: { grammar: "Checkpoint du bloc : monologue de 2 min entièrement au passé composé", vocab: "Révision de tout le bloc 3", tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Enregistre un monologue de deux minutes entièrement au passé composé." },
+  21: { grammar: "Passé composé avec avoir — verbes réguliers en -er", vocab: "Maison : maison, appartement, chambre, cuisine, salon", vocabWords: ["maison", "appartement", "chambre", "cuisine", "salon"], tables: [{ title: "Passé composé = avoir (conjugué) + participe passé", rows: CONJUGATIONS.avoir.rows, note: "Participes en -er : parlé, mangé, regardé, aimé, écouté, travaillé, habité." }], prompt: "Raconte ce que tu as fait aujourd'hui avec des verbes en -er : « J'ai parlé avec... », « J'ai mangé... »." },
+  22: { grammar: "Passé composé avec avoir — participes irréguliers", vocab: "travail, voiture, téléphone, argent, temps", vocabWords: ["travail", "voiture", "téléphone", "argent", "temps"], tables: [{ title: "Passé composé = avoir (conjugué) + participe passé", rows: CONJUGATIONS.avoir.rows, note: "Participes irréguliers : fait, eu, pris, mis, dit, vu." }], prompt: "Utilise j'ai fait, j'ai eu, j'ai pris, j'ai mis, j'ai dit ou j'ai vu — choisis-en trois et fais une phrase avec chacun." },
+  23: { grammar: "Révision : poser des questions au passé composé", vocab: "jour, semaine, week-end, matin, soir, nuit", vocabWords: ["jour/semaine/week-end", "matin/soir/nuit"], tables: [{ title: "Passé composé = avoir (conjugué) + participe passé", rows: CONJUGATIONS.avoir.rows }], prompt: "Demande à quelqu'un : « Qu'est-ce que tu as fait aujourd'hui ? » et réponds aussi pour toi-même." },
+  24: { grammar: "Verbes avec être au passé composé : aller, venir", vocab: "repas, dîner, déjeuner, courses, faire les courses", vocabWords: ["repas/dîner/déjeuner", "courses", "faire les courses"], tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows, note: "Le participe s'accorde : il est allé / elle est allée." }], prompt: "Raconte où tu es allé(e) et qui est venu te voir récemment : « Je suis allé(e)... », « Il/elle est venu(e)... »." },
+  25: { grammar: "Verbes avec être : arriver, partir", vocab: "ranger, nettoyer, rentrer", vocabWords: ["ranger", "nettoyer", "rentrer"], tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows, note: "Exemples : je suis arrivé(e), tu es parti(e)." }], prompt: "Raconte à quelle heure tu es arrivé(e) et parti(e) aujourd'hui." },
+  26: { grammar: "Révision : aller, venir, arriver, partir", vocab: "voyage, vacances, rendez-vous, projet", vocabWords: ["voyage/vacances", "rendez-vous", "projet"], tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows }], prompt: "Raconte ta journée en quatre phrases avec aller, venir, arriver et partir." },
+  27: { grammar: "Verbes avec être : rester, sortir", vocab: "problème, solution", vocabWords: ["problème", "solution"], tables: [{ title: "Passé composé avec être (verbes de mouvement)", rows: CONJUGATIONS.etre.rows, note: "Exemples : je suis resté(e), tu es sorti(e)." }], prompt: "Dis si tu es resté(e) à la maison ou si tu es sorti(e) ce week-end." },
+  28: { grammar: "Révision complète des verbes avec être — l'accord", vocab: "Révision vie quotidienne", vocabWords: [], tables: [{ title: "Passé composé avec être — accord", rows: CONJUGATIONS.etre.rows, note: "elle est allée / ils sont sortis / elles sont parties." }], prompt: "Raconte la journée de quelqu'un d'autre (il/elle) — fais attention à l'accord : « elle est allée », « ils sont sortis »." },
+  29: { grammar: "Mélange avoir + être au passé composé", vocab: "Révision vie quotidienne", vocabWords: [], tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte ta journée en mélangeant avoir et être : « Je suis allé(e) au travail, j'ai mangé, puis je suis rentré(e). »" },
+  30: { grammar: "Connecteurs de récit : puis, ensuite, alors", vocab: "Révision vie quotidienne", vocabWords: ["puis", "ensuite", "alors"], tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte ta journée en reliant les phrases avec puis, ensuite, alors." },
+  31: { grammar: "Révision libre du bloc", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Réécoute ta phrase du Jour 21 et améliore-la." },
+  32: { grammar: "Jour de parole : raconte ta journée d'hier en détail", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte ta journée d'hier en détail, à voix haute, une minute minimum." },
+  33: { grammar: "Jour de parole : raconte un événement familial récent", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Raconte un événement familial récent en quatre ou cinq phrases au passé composé." },
+  34: { grammar: "Révision des points faibles identifiés", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Reprends les verbes du passé composé qui te bloquent encore et répète-les trois fois chacun." },
+  35: { grammar: "Checkpoint du bloc : monologue de 2 min entièrement au passé composé", vocab: "Révision de tout le bloc 3", vocabWords: [], tables: [CONJUGATIONS.avoir, CONJUGATIONS.etre], prompt: "Enregistre un monologue de deux minutes entièrement au passé composé." },
 
-  36: { grammar: "Futur proche : aller + infinitif", vocab: "manger, boire, café, eau", tables: [{ title: "Futur proche = aller (conjugué) + infinitif", rows: CONJUGATIONS.aller.rows, note: "Exemple : je vais manger, tu vas sortir, ils vont rester." }], prompt: "Dis ce que tu vas faire avec aller + infinitif : « Je vais... », « Tu vas... », « Il/elle va... »." },
-  37: { grammar: "Futur proche — pratique : parler de cette semaine", vocab: "restaurant, inviter, fête, anniversaire, cadeau", tables: [{ title: "Futur proche = aller (conjugué) + infinitif", rows: CONJUGATIONS.aller.rows }], prompt: "Dis trois choses que tu vas faire cette semaine." },
-  38: { grammar: "Révision futur proche", vocab: "Révision nourriture & social", tables: [{ title: "Futur proche = aller (conjugué) + infinitif", rows: CONJUGATIONS.aller.rows }], prompt: "Demande à quelqu'un : « Qu'est-ce que tu vas faire ce week-end ? »" },
-  39: { grammar: "Impératif — formes « tu » (viens, attends, dis-moi, fais)", vocab: "boire un verre, cuisiner, recette, plat, dessert", tables: [CONJUGATIONS.impTu], prompt: "Donne trois ordres ou demandes avec l'impératif : « Viens ! », « Attends ! », « Dis-moi ! »." },
-  40: { grammar: "Impératif — formes « nous/vous » (allons-y, venez)", vocab: "santé, bon appétit, trinquer, partager un repas", tables: [CONJUGATIONS.impNousVous], prompt: "Utilise « Allons-y ! » et « Venez ! » dans une situation imaginée." },
-  41: { grammar: "Révision impératif", vocab: "Révision nourriture & social", tables: [CONJUGATIONS.impTu, CONJUGATIONS.impNousVous], prompt: "Pratique cinq demandes que tu dirais vraiment à la maison, à l'impératif." },
-  42: { grammar: "venir de + infinitif (passé récent) — introduction", vocab: "Révision : rendez-vous, projet", tables: [{ title: "venir de + infinitif (passé récent)", rows: CONJUGATIONS.venir.rows, note: "Exemple : je viens de manger, tu viens de partir." }], prompt: "Dis ce que tu viens de faire : « Je viens de... », « Tu viens de... »." },
-  43: { grammar: "venir de + infinitif — pratique", vocab: "Révision libre", tables: [{ title: "venir de + infinitif (passé récent)", rows: CONJUGATIONS.venir.rows }], prompt: "Dis trois choses que tu viens de faire aujourd'hui." },
-  44: { grammar: "Révision : venir de + futur proche ensemble", vocab: "Révision libre", tables: [CONJUGATIONS.aller, CONJUGATIONS.venir], prompt: "Combine les deux dans une phrase : « Je viens de... et je vais... »." },
-  45: { grammar: "Mélange : projets + actions récentes + demandes", vocab: "Révision libre", tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu], prompt: "Raconte un plan : ce que tu viens de faire, ce que tu vas faire, et une demande à quelqu'un." },
-  46: { grammar: "Jour de parole : fais des projets pour le week-end à voix haute", vocab: "Révision libre", tables: [CONJUGATIONS.aller], prompt: "Fais des projets pour le week-end à voix haute, avec aller + infinitif." },
-  47: { grammar: "Jour de parole : 5 vraies demandes que tu dirais à la maison", vocab: "Révision libre", tables: [CONJUGATIONS.impTu, CONJUGATIONS.impNousVous], prompt: "Dis cinq vraies demandes que tu dirais à la maison, à l'impératif." },
-  48: { grammar: "Révision des points faibles", vocab: "Révision libre", tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu], prompt: "Reprends ce qui te bloque encore dans ce bloc et répète-le." },
-  49: { grammar: "Intègre tout le bloc dans un dialogue court", vocab: "Révision libre", tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu, CONJUGATIONS.impNousVous], prompt: "Imagine un court dialogue avec futur proche, impératif et venir de." },
-  50: { grammar: "Checkpoint du bloc : monologue de 2 min avec futur proche, impératif, venir de", vocab: "Révision de tout le bloc 4", tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu], prompt: "Enregistre un monologue de deux minutes avec futur proche, impératif et venir de." },
+  36: { grammar: "Futur proche : aller + infinitif", vocab: "manger, boire, café, eau", vocabWords: ["manger", "boire", "café", "eau"], tables: [{ title: "Futur proche = aller (conjugué) + infinitif", rows: CONJUGATIONS.aller.rows, note: "Exemple : je vais manger, tu vas sortir, ils vont rester." }], prompt: "Dis ce que tu vas faire avec aller + infinitif : « Je vais... », « Tu vas... », « Il/elle va... »." },
+  37: { grammar: "Futur proche — pratique : parler de cette semaine", vocab: "restaurant, inviter, fête, anniversaire, cadeau", vocabWords: ["restaurant", "inviter", "fête", "anniversaire", "cadeau"], tables: [{ title: "Futur proche = aller (conjugué) + infinitif", rows: CONJUGATIONS.aller.rows }], prompt: "Dis trois choses que tu vas faire cette semaine." },
+  38: { grammar: "Révision futur proche", vocab: "Révision nourriture & social", vocabWords: [], tables: [{ title: "Futur proche = aller (conjugué) + infinitif", rows: CONJUGATIONS.aller.rows }], prompt: "Demande à quelqu'un : « Qu'est-ce que tu vas faire ce week-end ? »" },
+  39: { grammar: "Impératif — formes « tu » (viens, attends, dis-moi, fais)", vocab: "boire un verre, cuisiner, recette, plat, dessert", vocabWords: ["boire un verre", "cuisiner", "recette", "plat", "dessert"], tables: [CONJUGATIONS.impTu], prompt: "Donne trois ordres ou demandes avec l'impératif : « Viens ! », « Attends ! », « Dis-moi ! »." },
+  40: { grammar: "Impératif — formes « nous/vous » (allons-y, venez)", vocab: "santé, bon appétit, trinquer, partager un repas", vocabWords: ["santé", "bon appétit", "trinquer", "partager un repas"], tables: [CONJUGATIONS.impNousVous], prompt: "Utilise « Allons-y ! » et « Venez ! » dans une situation imaginée." },
+  41: { grammar: "Révision impératif", vocab: "Révision nourriture & social", vocabWords: [], tables: [CONJUGATIONS.impTu, CONJUGATIONS.impNousVous], prompt: "Pratique cinq demandes que tu dirais vraiment à la maison, à l'impératif." },
+  42: { grammar: "venir de + infinitif (passé récent) — introduction", vocab: "Révision : rendez-vous, projet", vocabWords: [], tables: [{ title: "venir de + infinitif (passé récent)", rows: CONJUGATIONS.venir.rows, note: "Exemple : je viens de manger, tu viens de partir." }], prompt: "Dis ce que tu viens de faire : « Je viens de... », « Tu viens de... »." },
+  43: { grammar: "venir de + infinitif — pratique", vocab: "Révision libre", vocabWords: [], tables: [{ title: "venir de + infinitif (passé récent)", rows: CONJUGATIONS.venir.rows }], prompt: "Dis trois choses que tu viens de faire aujourd'hui." },
+  44: { grammar: "Révision : venir de + futur proche ensemble", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.aller, CONJUGATIONS.venir], prompt: "Combine les deux dans une phrase : « Je viens de... et je vais... »." },
+  45: { grammar: "Mélange : projets + actions récentes + demandes", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu], prompt: "Raconte un plan : ce que tu viens de faire, ce que tu vas faire, et une demande à quelqu'un." },
+  46: { grammar: "Jour de parole : fais des projets pour le week-end à voix haute", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.aller], prompt: "Fais des projets pour le week-end à voix haute, avec aller + infinitif." },
+  47: { grammar: "Jour de parole : 5 vraies demandes que tu dirais à la maison", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.impTu, CONJUGATIONS.impNousVous], prompt: "Dis cinq vraies demandes que tu dirais à la maison, à l'impératif." },
+  48: { grammar: "Révision des points faibles", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu], prompt: "Reprends ce qui te bloque encore dans ce bloc et répète-le." },
+  49: { grammar: "Intègre tout le bloc dans un dialogue court", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu, CONJUGATIONS.impNousVous], prompt: "Imagine un court dialogue avec futur proche, impératif et venir de." },
+  50: { grammar: "Checkpoint du bloc : monologue de 2 min avec futur proche, impératif, venir de", vocab: "Révision de tout le bloc 4", vocabWords: [], tables: [CONJUGATIONS.aller, CONJUGATIONS.venir, CONJUGATIONS.impTu], prompt: "Enregistre un monologue de deux minutes avec futur proche, impératif et venir de." },
 
-  51: { grammar: "je voudrais / j'aimerais", vocab: "Révision émotions & opinions", tables: [CONJUGATIONS.condChunks], prompt: "Utilise « je voudrais » et « j'aimerais » dans deux phrases sur ce que tu veux faire bientôt." },
-  52: { grammar: "tu pourrais / est-ce que tu pourrais", vocab: "Révision émotions & opinions", tables: [CONJUGATIONS.condChunks], prompt: "Transforme une demande directe en demande adoucie : « Fais ça » → « Tu pourrais faire ça ? »." },
-  53: { grammar: "ça serait + révision des formules d'adoucissement", vocab: "d'accord, pas d'accord, sûr(e), peut-être", tables: [CONJUGATIONS.condChunks], prompt: "Utilise « ça serait » dans une phrase : « Ça serait bien de... »." },
-  54: { grammar: "Désaccord & réparation : pas d'accord, ce n'est pas grave, on peut en parler", vocab: "Révision libre", tables: [CONJUGATIONS.condChunks], prompt: "Pratique : « Je ne suis pas d'accord, mais... » suivi de « Ce n'est pas grave » ou « On peut en parler »." },
-  55: { grammar: "Checkpoint du bloc : adoucis 3 demandes réelles + 1 désaccord", vocab: "Révision de tout le bloc 5", tables: [CONJUGATIONS.condChunks], prompt: "Adoucis trois demandes réelles et pratique un désaccord avec réparation." },
+  51: { grammar: "je voudrais / j'aimerais", vocab: "Révision émotions & opinions", vocabWords: [], tables: [CONJUGATIONS.condChunks], prompt: "Utilise « je voudrais » et « j'aimerais » dans deux phrases sur ce que tu veux faire bientôt." },
+  52: { grammar: "tu pourrais / est-ce que tu pourrais", vocab: "Révision émotions & opinions", vocabWords: [], tables: [CONJUGATIONS.condChunks], prompt: "Transforme une demande directe en demande adoucie : « Fais ça » → « Tu pourrais faire ça ? »." },
+  53: { grammar: "ça serait + révision des formules d'adoucissement", vocab: "d'accord, pas d'accord, sûr(e), peut-être", vocabWords: ["sûr(e)", "peut-être"], tables: [CONJUGATIONS.condChunks], prompt: "Utilise « ça serait » dans une phrase : « Ça serait bien de... »." },
+  54: { grammar: "Désaccord & réparation : pas d'accord, ce n'est pas grave, on peut en parler", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.condChunks], prompt: "Pratique : « Je ne suis pas d'accord, mais... » suivi de « Ce n'est pas grave » ou « On peut en parler »." },
+  55: { grammar: "Checkpoint du bloc : adoucis 3 demandes réelles + 1 désaccord", vocab: "Révision de tout le bloc 5", vocabWords: [], tables: [CONJUGATIONS.condChunks], prompt: "Adoucis trois demandes réelles et pratique un désaccord avec réparation." },
 
-  56: { grammar: "Aucune nouvelle structure — monologue intégrant présent, passé composé, futur proche, conditionnel", vocab: "Révision générale", tables: [], prompt: "Enregistre un monologue de deux minutes intégrant présent, passé composé, futur proche et une formule au conditionnel." },
-  57: { grammar: "Vraie conversation de 10+ minutes, sans anglais pendant les 5 premières minutes", vocab: "Révision générale", tables: [], prompt: "Vraie conversation de dix minutes ou plus, sans anglais pendant les cinq premières minutes." },
-  58: { grammar: "Compare ton enregistrement du Jour 20 à aujourd'hui", vocab: "Révision générale", tables: [], prompt: "Réécoute ton enregistrement du Jour 20 — qu'est-ce qui a changé depuis ?" },
-  59: { grammar: "Réparation ciblée des 3 points qui te bloquent encore", vocab: "Révision générale", tables: [], prompt: "Reprends les trois points qui te bloquent encore et entraîne-toi uniquement sur ceux-là." },
-  60: { grammar: "Monologue final + vraie conversation — compare au Jour 1", vocab: "Révision générale", tables: [], prompt: "Monologue final, puis vraie conversation — compare au tout premier jour." }
+  56: { grammar: "Aucune nouvelle structure — monologue intégrant présent, passé composé, futur proche, conditionnel", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Enregistre un monologue de deux minutes intégrant présent, passé composé, futur proche et une formule au conditionnel." },
+  57: { grammar: "Vraie conversation de 10+ minutes, sans anglais pendant les 5 premières minutes", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Vraie conversation de dix minutes ou plus, sans anglais pendant les cinq premières minutes." },
+  58: { grammar: "Compare ton enregistrement du Jour 20 à aujourd'hui", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Réécoute ton enregistrement du Jour 20 — qu'est-ce qui a changé depuis ?" },
+  59: { grammar: "Réparation ciblée des 3 points qui te bloquent encore", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Reprends les trois points qui te bloquent encore et entraîne-toi uniquement sur ceux-là." },
+  60: { grammar: "Monologue final + vraie conversation — compare au Jour 1", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Monologue final, puis vraie conversation — compare au tout premier jour." }
 };
 
+// Days where every table should render collapsed by default (heavy review days —
+// the learner already knows this material, so tables are reference, not the lesson).
+const REVIEW_DAYS = [10, 20, 35, 50];
+
 const SESSION_TEMPLATE = [
-  "Recall — quick spaced-repetition pass on today's vocab/chunk batch (3-5 min)",
-  "Listening + shadowing — one native-speed clip, listen twice, shadow it out loud (7-8 min)",
-  "Speaking output — answer today's prompt out loud, recorded or with a real person (8-10 min)",
-  "Reading or writing — short native text, or write 3-4 sentences with the new structure (3-5 min)"
+  "Rappel — révision rapide du vocabulaire et des phrases du jour (3–5 min)",
+  "Écoute + répétition — une séquence audio, écoute deux fois puis répète à voix haute (7–8 min)",
+  "Expression orale — réponds à la question du jour à voix haute, enregistré(e) ou avec quelqu'un (8–10 min)",
+  "Lecture ou écriture — un court texte, ou écris 3–4 phrases avec la structure du jour (3–5 min)"
 ];
