@@ -154,6 +154,26 @@ function renderToday() {
     chipsEl.appendChild(chip);
   });
 
+  // Example sentences for today's vocab — one per word, using only grammar
+  // taught up to this day, each with its own TTS button.
+  const examplesEl = document.getElementById("today-vocab-examples");
+  examplesEl.innerHTML = "";
+  (detail.vocabExamples || []).forEach(([fr, en]) => {
+    const row = document.createElement("div");
+    row.className = "example-sentence";
+    const left = document.createElement("div");
+    left.className = "example-sentence-text";
+    left.innerHTML = `<span class="ex-fr">${fr}</span><span class="ex-en">${en}</span>`;
+    const btn = document.createElement("button");
+    btn.className = "speak-btn";
+    btn.textContent = "🔊";
+    btn.setAttribute("aria-label", `Écouter : ${fr}`);
+    btn.onclick = () => speak(fr);
+    row.appendChild(left);
+    row.appendChild(btn);
+    examplesEl.appendChild(row);
+  });
+
   // Conjugation tables — collapsible <details>, closed by default on heavy
   // review days so the page doesn't open as a wall of grids.
   const isReviewDay = REVIEW_DAYS.includes(day);

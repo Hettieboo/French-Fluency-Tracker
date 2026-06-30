@@ -237,6 +237,25 @@ h3 {
 }
 .vocab-chip button:hover { background: var(--accent-soft); }
 
+/* ===== Today's example sentences ===== */
+.example-sentence-list { margin: 0 0 18px; }
+.example-sentence-list:empty { display: none; }
+
+.example-sentence {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: white;
+  border: 1px solid var(--grid-line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.example-sentence-text { flex: 1; }
+.ex-fr { display: block; font-weight: 600; font-size: 14.5px; }
+.ex-en { display: block; color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
+
 /* ===== Conjugation tables ===== */
 #conjugation-tables { margin-bottom: 6px; }
 
