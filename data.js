@@ -356,9 +356,13 @@ const DAY_DETAILS = {
 // the learner already knows this material, so tables are reference, not the lesson).
 const REVIEW_DAYS = [10, 20, 35, 50];
 
+// Each step is [French headline, English gloss]. The checklist itself is
+// operational instruction, not learning content, so a muted English subtext
+// is shown under each French line — it's scaffolding for early days, not
+// something to actively study.
 const SESSION_TEMPLATE = [
-  "Rappel — révision rapide du vocabulaire et des phrases du jour (3–5 min)",
-  "Écoute + répétition — une séquence audio, écoute deux fois puis répète à voix haute (7–8 min)",
-  "Expression orale — réponds à la question du jour à voix haute, enregistré(e) ou avec quelqu'un (8–10 min)",
-  "Lecture ou écriture — un court texte, ou écris 3–4 phrases avec la structure du jour (3–5 min)"
+  ["Rappel", "Quick review of today's vocab and example sentences (3–5 min)"],
+  ["Écoute + répétition", "Listen to each example sentence twice, then repeat it out loud (7–8 min)"],
+  ["Expression orale", "Answer today's prompt out loud — recorded, or with a real person (8–10 min)"],
+  ["Lecture ou écriture", "Read today's material again, or write 3–4 sentences using today's structure (3–5 min)"]
 ];

@@ -136,6 +136,20 @@ function renderToday() {
   document.getElementById("jump-input").value = day;
   document.getElementById("today-main").style.setProperty("--block-color", block.color || "#2c5f8a");
 
+  // Section order: on teaching days, show the grammar/examples first so the
+  // learner has the tool before being asked to produce something with it.
+  // On review days, the learner already knows the material, so the prompt
+  // (retrieval practice) comes first and reference tables stay below it.
+  const promptSection = document.getElementById("prompt-section");
+  const learningSection = document.getElementById("learning-section");
+  const container = promptSection.parentNode;
+  const isReviewDay = REVIEW_DAYS.includes(day);
+  if (isReviewDay) {
+    container.insertBefore(promptSection, learningSection);
+  } else {
+    container.insertBefore(learningSection, promptSection);
+  }
+
   // Example sentences for today's vocab — one per word, using only grammar
   // taught up to this day, each with its own TTS button.
   const examplesEl = document.getElementById("today-vocab-examples");
@@ -158,7 +172,6 @@ function renderToday() {
 
   // Conjugation tables — collapsible <details>, closed by default on heavy
   // review days so the page doesn't open as a wall of grids.
-  const isReviewDay = REVIEW_DAYS.includes(day);
   const tablesEl = document.getElementById("conjugation-tables");
   tablesEl.innerHTML = "";
   (detail.tables || []).forEach(table => {
@@ -221,7 +234,7 @@ function renderToday() {
   const checklistEl = document.getElementById("session-checklist");
   const savedState = getChecklistState(day);
   checklistEl.innerHTML = "";
-  SESSION_TEMPLATE.forEach((step, i) => {
+  SESSION_TEMPLATE.forEach(([fr, en], i) => {
     const li = document.createElement("li");
     if (savedState[i]) li.classList.add("step-done");
     const checkbox = document.createElement("input");
@@ -234,10 +247,18 @@ function renderToday() {
       li.classList.toggle("step-done", checkbox.checked);
       updateChecklistProgress(day);
     });
-    const span = document.createElement("span");
-    span.textContent = step;
+    const textWrap = document.createElement("span");
+    textWrap.className = "checklist-text";
+    const frSpan = document.createElement("span");
+    frSpan.className = "checklist-fr";
+    frSpan.textContent = fr;
+    const enSpan = document.createElement("span");
+    enSpan.className = "checklist-en";
+    enSpan.textContent = en;
+    textWrap.appendChild(frSpan);
+    textWrap.appendChild(enSpan);
     li.appendChild(checkbox);
-    li.appendChild(span);
+    li.appendChild(textWrap);
     checklistEl.appendChild(li);
   });
   updateChecklistProgress(day);

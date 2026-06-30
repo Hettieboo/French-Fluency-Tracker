@@ -323,7 +323,11 @@ h3 {
   font-size: 14px;
 }
 .checklist li input { margin-top: 3px; accent-color: var(--accent); }
-.checklist li.step-done span { color: var(--ink-soft); text-decoration: line-through; }
+.checklist-text { display: flex; flex-direction: column; }
+.checklist-fr { font-weight: 500; color: var(--ink); }
+.checklist-en { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+.checklist li.step-done .checklist-fr,
+.checklist li.step-done .checklist-en { color: var(--ink-soft); text-decoration: line-through; }
 
 .notes-pad {
   width: 100%;
