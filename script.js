@@ -136,24 +136,6 @@ function renderToday() {
   document.getElementById("jump-input").value = day;
   document.getElementById("today-main").style.setProperty("--block-color", block.color || "#2c5f8a");
 
-  // Today's focus vocab, as chips above the conjugation tables.
-  const chipsEl = document.getElementById("today-vocab-chips");
-  chipsEl.innerHTML = "";
-  (detail.vocabWords || []).forEach(frTerm => {
-    const entry = findVocabEntry(frTerm);
-    if (!entry) return;
-    const [fr, en] = entry;
-    const chip = document.createElement("div");
-    chip.className = "vocab-chip";
-    chip.innerHTML = `<span class="chip-fr">${fr}</span><span class="chip-en">${en}</span>`;
-    const btn = document.createElement("button");
-    btn.textContent = "🔊";
-    btn.setAttribute("aria-label", `Écouter ${fr}`);
-    btn.onclick = () => speak(fr);
-    chip.appendChild(btn);
-    chipsEl.appendChild(chip);
-  });
-
   // Example sentences for today's vocab — one per word, using only grammar
   // taught up to this day, each with its own TTS button.
   const examplesEl = document.getElementById("today-vocab-examples");
