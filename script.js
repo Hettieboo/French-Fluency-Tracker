@@ -1,4 +1,4 @@
-// script.js — behavior for the 60-day French tracker
+// script.js — behavior for the French Learning App
 // No build step, no dependencies. Open index.html directly or serve via GitHub Pages.
 
 const STORAGE_KEYS = {
@@ -111,6 +111,20 @@ function findVocabEntry(frTerm) {
   return null;
 }
 
+// Days are being migrated from the old flat `vocabExamples` array to the
+// richer `examples: { grammar, listening }` structure phase by phase. This
+// reads whichever shape a given day happens to have, so days not yet
+// migrated keep working exactly as before.
+function getGrammarExamples(detail) {
+  if (detail.examples && detail.examples.grammar) return detail.examples.grammar;
+  return detail.vocabExamples || [];
+}
+
+function getListeningExamples(detail) {
+  if (detail.examples && detail.examples.listening) return detail.examples.listening;
+  return [];
+}
+
 function updateChecklistProgress(day) {
   const state = getChecklistState(day);
   const total = SESSION_TEMPLATE.length;
@@ -118,6 +132,25 @@ function updateChecklistProgress(day) {
   const el = document.getElementById("checklist-progress");
   el.textContent = `${done}/${total}`;
   el.classList.toggle("complete", done === total);
+}
+
+function renderSentenceList(container, sentences) {
+  container.innerHTML = "";
+  sentences.forEach(([fr, en]) => {
+    const row = document.createElement("div");
+    row.className = "example-sentence";
+    const left = document.createElement("div");
+    left.className = "example-sentence-text";
+    left.innerHTML = `<span class="ex-fr">${fr}</span><span class="ex-en">${en}</span>`;
+    const btn = document.createElement("button");
+    btn.className = "speak-btn";
+    btn.textContent = "🔊";
+    btn.setAttribute("aria-label", `Écouter : ${fr}`);
+    btn.onclick = () => speak(fr);
+    row.appendChild(left);
+    row.appendChild(btn);
+    container.appendChild(row);
+  });
 }
 
 /* ---------- Rendering: Today ---------- */
@@ -150,25 +183,63 @@ function renderToday() {
     container.insertBefore(learningSection, promptSection);
   }
 
-  // Example sentences for today's vocab — one per word, using only grammar
-  // taught up to this day, each with its own TTS button.
+  // Grammar example sentences — one per sentence, using only grammar taught
+  // up to this day, each with its own TTS button.
+  const grammarExamples = getGrammarExamples(detail);
   const examplesEl = document.getElementById("today-vocab-examples");
-  examplesEl.innerHTML = "";
-  (detail.vocabExamples || []).forEach(([fr, en]) => {
-    const row = document.createElement("div");
-    row.className = "example-sentence";
-    const left = document.createElement("div");
-    left.className = "example-sentence-text";
-    left.innerHTML = `<span class="ex-fr">${fr}</span><span class="ex-en">${en}</span>`;
+  const examplesHeading = document.getElementById("today-vocab-examples-heading");
+  renderSentenceList(examplesEl, grammarExamples);
+  examplesHeading.style.display = grammarExamples.length ? "" : "none";
+
+  // Mini dialogue — a short natural back-and-forth using today's grammar,
+  // rendered as alternating speaker bubbles (A on the left, B on the right).
+  const dialogueEl = document.getElementById("today-dialogue");
+  const dialogueHeading = document.getElementById("today-dialogue-heading");
+  dialogueEl.innerHTML = "";
+  const dialogue = detail.dialogue || [];
+  dialogue.forEach(([speaker, fr, en]) => {
+    const line = document.createElement("div");
+    line.className = `dialogue-line speaker-${speaker === "A" ? "a" : "b"}`;
+    const bubble = document.createElement("div");
+    bubble.className = "dialogue-bubble";
+    const label = document.createElement("span");
+    label.className = "dialogue-speaker";
+    label.textContent = speaker;
+    const text = document.createElement("div");
+    text.className = "dialogue-text";
+    text.innerHTML = `<span class="ex-fr">${fr}</span><span class="ex-en">${en}</span>`;
     const btn = document.createElement("button");
-    btn.className = "speak-btn";
+    btn.className = "speak-btn small";
     btn.textContent = "🔊";
     btn.setAttribute("aria-label", `Écouter : ${fr}`);
     btn.onclick = () => speak(fr);
-    row.appendChild(left);
-    row.appendChild(btn);
-    examplesEl.appendChild(row);
+    bubble.appendChild(label);
+    bubble.appendChild(text);
+    bubble.appendChild(btn);
+    line.appendChild(bubble);
+    dialogueEl.appendChild(line);
   });
+  dialogueHeading.style.display = dialogue.length ? "" : "none";
+
+  // Listening practice — a short curated set meant to be played and repeated
+  // twice out loud, separate from the grammar drill above.
+  const listeningExamples = getListeningExamples(detail);
+  const listeningEl = document.getElementById("today-listening");
+  const listeningHeading = document.getElementById("today-listening-heading");
+  renderSentenceList(listeningEl, listeningExamples);
+  listeningHeading.style.display = listeningExamples.length ? "" : "none";
+
+  // "Did you notice?" — a short cultural/grammatical insight for the day,
+  // shown only when one is defined.
+  const noticeEl = document.getElementById("today-notice");
+  if (detail.didYouNotice) {
+    noticeEl.innerHTML = `<p class="notice-label">💡 Le sais-tu ?</p><p class="notice-text"></p>`;
+    noticeEl.querySelector(".notice-text").textContent = detail.didYouNotice;
+    noticeEl.style.display = "";
+  } else {
+    noticeEl.innerHTML = "";
+    noticeEl.style.display = "none";
+  }
 
   // Conjugation tables — collapsible <details>, closed by default on heavy
   // review days so the page doesn't open as a wall of grids.

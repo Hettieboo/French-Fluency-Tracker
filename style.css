@@ -10,6 +10,8 @@
   --stamp-green: #4f7942;
   --warm-complete: #c1763f;
   --warm-complete-hover: #a8632f;
+  --notice-gold: #b8862f;
+  --notice-gold-soft: #f7efdd;
   --shadow: rgba(31, 42, 68, 0.10);
   --radius: 6px;
 }
@@ -237,8 +239,20 @@ h3 {
 }
 .vocab-chip button:hover { background: var(--accent-soft); }
 
+/* ===== Learning-section sub-headings (Grammar examples / Mini dialogue / Écoute) ===== */
+.learning-subhead {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--ink-soft);
+  margin: 22px 0 8px;
+  display: block;
+}
+/* Hide a subhead whenever its content div right after it is empty — the
+   heading and the list are toggled together from script.js. */
+
 /* ===== Today's example sentences ===== */
-.example-sentence-list { margin: 0 0 18px; }
+.example-sentence-list { margin: 0 0 6px; }
 .example-sentence-list:empty { display: none; }
 
 .example-sentence {
@@ -255,6 +269,66 @@ h3 {
 .example-sentence-text { flex: 1; }
 .ex-fr { display: block; font-weight: 600; font-size: 14.5px; }
 .ex-en { display: block; color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
+
+/* ===== Mini dialogue (chat-bubble style, A left / B right) ===== */
+.dialogue-box { margin: 0 0 6px; display: flex; flex-direction: column; gap: 8px; }
+.dialogue-box:empty { display: none; }
+
+.dialogue-line { display: flex; }
+.dialogue-line.speaker-a { justify-content: flex-start; }
+.dialogue-line.speaker-b { justify-content: flex-end; }
+
+.dialogue-bubble {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 82%;
+  border-radius: 14px;
+  padding: 9px 12px;
+  border: 1px solid var(--grid-line);
+}
+.dialogue-line.speaker-a .dialogue-bubble {
+  background: white;
+  border-top-left-radius: 4px;
+}
+.dialogue-line.speaker-b .dialogue-bubble {
+  background: var(--accent-soft);
+  border-top-right-radius: 4px;
+}
+
+.dialogue-speaker {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent);
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+.dialogue-text { flex: 1; }
+.dialogue-text .ex-fr { font-size: 14px; }
+.dialogue-text .ex-en { font-size: 12px; }
+
+@media (max-width: 640px) {
+  .dialogue-bubble { max-width: 92%; }
+}
+
+/* ===== "Did you notice?" callout ===== */
+.notice-box {
+  background: var(--notice-gold-soft);
+  border-left: 3px solid var(--notice-gold);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 16px 0 6px;
+}
+.notice-box:empty { display: none; }
+.notice-label {
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  color: var(--notice-gold);
+  margin: 0 0 4px;
+}
+.notice-text { margin: 0; font-size: 13.5px; color: var(--ink); line-height: 1.5; }
 
 /* ===== Conjugation tables ===== */
 #conjugation-tables { margin-bottom: 6px; }
