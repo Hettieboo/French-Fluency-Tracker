@@ -1,4 +1,4 @@
-// script.js — behavior for the French Learning App
+// script.js — behavior for the 60-day French tracker
 // No build step, no dependencies. Open index.html directly or serve via GitHub Pages.
 
 const STORAGE_KEYS = {
@@ -99,165 +99,38 @@ function computeStreak() {
   return streak;
 }
 
-/* ---------- Helpers ---------- */
-
-// Look up a VOCAB entry by its French headword (exact match against the fr
-// column across all categories). Returns [fr, en] or null if not found.
-function findVocabEntry(frTerm) {
-  for (const words of Object.values(VOCAB)) {
-    const hit = words.find(([fr]) => fr === frTerm);
-    if (hit) return hit;
-  }
-  return null;
-}
-
-// Days are being migrated from the old flat `vocabExamples` array to the
-// richer `examples: { grammar, listening }` structure phase by phase. This
-// reads whichever shape a given day happens to have, so days not yet
-// migrated keep working exactly as before.
-function getGrammarExamples(detail) {
-  if (detail.examples && detail.examples.grammar) return detail.examples.grammar;
-  return detail.vocabExamples || [];
-}
-
-function getListeningExamples(detail) {
-  if (detail.examples && detail.examples.listening) return detail.examples.listening;
-  return [];
-}
-
-function updateChecklistProgress(day) {
-  const state = getChecklistState(day);
-  const total = SESSION_TEMPLATE.length;
-  const done = state.filter(Boolean).length;
-  const el = document.getElementById("checklist-progress");
-  el.textContent = `${done}/${total}`;
-  el.classList.toggle("complete", done === total);
-}
-
-function renderSentenceList(container, sentences) {
-  container.innerHTML = "";
-  sentences.forEach(([fr, en]) => {
-    const row = document.createElement("div");
-    row.className = "example-sentence";
-    const left = document.createElement("div");
-    left.className = "example-sentence-text";
-    left.innerHTML = `<span class="ex-fr">${fr}</span><span class="ex-en">${en}</span>`;
-    const btn = document.createElement("button");
-    btn.className = "speak-btn";
-    btn.textContent = "🔊";
-    btn.setAttribute("aria-label", `Écouter : ${fr}`);
-    btn.onclick = () => speak(fr);
-    row.appendChild(left);
-    row.appendChild(btn);
-    container.appendChild(row);
-  });
-}
-
 /* ---------- Rendering: Today ---------- */
 
 function renderToday() {
   const day = getCurrentDay();
   const block = getBlockForDay(day);
-  const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, vocabWords: [], tables: [], prompt: block.prompts[0] };
+  const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, tables: [], prompt: block.prompts[0] };
   const prompt = detail.prompt;
 
   document.getElementById("day-stamp").textContent = `Jour ${day}`;
   document.getElementById("block-title").textContent = `${block.title} (jours ${block.range[0]}–${block.range[1]})`;
   document.getElementById("block-grammar").textContent = detail.grammar;
+  document.getElementById("block-vocab").textContent = detail.vocab;
   document.getElementById("today-prompt").textContent = prompt;
   document.getElementById("streak-number").textContent = computeStreak();
   document.getElementById("jump-input").value = day;
-  document.getElementById("today-main").style.setProperty("--block-color", block.color || "#2c5f8a");
 
-  // Section order: on teaching days, show the grammar/examples first so the
-  // learner has the tool before being asked to produce something with it.
-  // On review days, the learner already knows the material, so the prompt
-  // (retrieval practice) comes first and reference tables stay below it.
-  const promptSection = document.getElementById("prompt-section");
-  const learningSection = document.getElementById("learning-section");
-  const container = promptSection.parentNode;
-  const isReviewDay = REVIEW_DAYS.includes(day);
-  if (isReviewDay) {
-    container.insertBefore(promptSection, learningSection);
-  } else {
-    container.insertBefore(learningSection, promptSection);
-  }
-
-  // Grammar example sentences — one per sentence, using only grammar taught
-  // up to this day, each with its own TTS button.
-  const grammarExamples = getGrammarExamples(detail);
-  const examplesEl = document.getElementById("today-vocab-examples");
-  const examplesHeading = document.getElementById("today-vocab-examples-heading");
-  renderSentenceList(examplesEl, grammarExamples);
-  examplesHeading.style.display = grammarExamples.length ? "" : "none";
-
-  // Mini dialogue — a short natural back-and-forth using today's grammar,
-  // rendered as alternating speaker bubbles (A on the left, B on the right).
-  const dialogueEl = document.getElementById("today-dialogue");
-  const dialogueHeading = document.getElementById("today-dialogue-heading");
-  dialogueEl.innerHTML = "";
-  const dialogue = detail.dialogue || [];
-  dialogue.forEach(([speaker, fr, en]) => {
-    const line = document.createElement("div");
-    line.className = `dialogue-line speaker-${speaker === "A" ? "a" : "b"}`;
-    const bubble = document.createElement("div");
-    bubble.className = "dialogue-bubble";
-    const label = document.createElement("span");
-    label.className = "dialogue-speaker";
-    label.textContent = speaker;
-    const text = document.createElement("div");
-    text.className = "dialogue-text";
-    text.innerHTML = `<span class="ex-fr">${fr}</span><span class="ex-en">${en}</span>`;
-    const btn = document.createElement("button");
-    btn.className = "speak-btn small";
-    btn.textContent = "🔊";
-    btn.setAttribute("aria-label", `Écouter : ${fr}`);
-    btn.onclick = () => speak(fr);
-    bubble.appendChild(label);
-    bubble.appendChild(text);
-    bubble.appendChild(btn);
-    line.appendChild(bubble);
-    dialogueEl.appendChild(line);
-  });
-  dialogueHeading.style.display = dialogue.length ? "" : "none";
-
-  // Listening practice — a short curated set meant to be played and repeated
-  // twice out loud, separate from the grammar drill above.
-  const listeningExamples = getListeningExamples(detail);
-  const listeningEl = document.getElementById("today-listening");
-  const listeningHeading = document.getElementById("today-listening-heading");
-  renderSentenceList(listeningEl, listeningExamples);
-  listeningHeading.style.display = listeningExamples.length ? "" : "none";
-
-  // "Did you notice?" — a short cultural/grammatical insight for the day,
-  // shown only when one is defined.
-  const noticeEl = document.getElementById("today-notice");
-  if (detail.didYouNotice) {
-    noticeEl.innerHTML = `<p class="notice-label">💡 Le sais-tu ?</p><p class="notice-text"></p>`;
-    noticeEl.querySelector(".notice-text").textContent = detail.didYouNotice;
-    noticeEl.style.display = "";
-  } else {
-    noticeEl.innerHTML = "";
-    noticeEl.style.display = "none";
-  }
-
-  // Conjugation tables — collapsible <details>, closed by default on heavy
-  // review days so the page doesn't open as a wall of grids.
   const tablesEl = document.getElementById("conjugation-tables");
   tablesEl.innerHTML = "";
   (detail.tables || []).forEach(table => {
-    const details = document.createElement("details");
-    details.className = "conj-table";
-    if (!isReviewDay) details.setAttribute("open", "");
-
-    const summary = document.createElement("summary");
-    summary.textContent = table.title;
-    details.appendChild(summary);
-
-    const body = document.createElement("div");
-    body.className = "conj-table-body";
-
+    const card = document.createElement("div");
+    card.className = "conj-table";
+    const h4 = document.createElement("h4");
+    h4.textContent = table.title;
+    card.appendChild(h4);
+    if (table.meaning) {
+      const meaning = document.createElement("p");
+      meaning.className = "conj-meaning";
+      meaning.textContent = "→ " + table.meaning;
+      card.appendChild(meaning);
+    }
     const tableEl = document.createElement("table");
+
     table.rows.forEach(([pronoun, form]) => {
       const tr = document.createElement("tr");
       const tdP = document.createElement("td");
@@ -285,17 +158,14 @@ function renderToday() {
       tr.appendChild(tdBtn);
       tableEl.appendChild(tr);
     });
-    body.appendChild(tableEl);
-
+    card.appendChild(tableEl);
     if (table.note) {
       const note = document.createElement("p");
       note.className = "conj-note";
       note.textContent = table.note;
-      body.appendChild(note);
+      card.appendChild(note);
     }
-
-    details.appendChild(body);
-    tablesEl.appendChild(details);
+    tablesEl.appendChild(card);
   });
 
   const notesEl = document.getElementById("day-notes");
@@ -305,9 +175,8 @@ function renderToday() {
   const checklistEl = document.getElementById("session-checklist");
   const savedState = getChecklistState(day);
   checklistEl.innerHTML = "";
-  SESSION_TEMPLATE.forEach(([fr, en], i) => {
+  SESSION_TEMPLATE.forEach((step, i) => {
     const li = document.createElement("li");
-    if (savedState[i]) li.classList.add("step-done");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = !!savedState[i];
@@ -315,24 +184,13 @@ function renderToday() {
       const state = getChecklistState(day);
       state[i] = checkbox.checked;
       setChecklistState(day, state);
-      li.classList.toggle("step-done", checkbox.checked);
-      updateChecklistProgress(day);
     });
-    const textWrap = document.createElement("span");
-    textWrap.className = "checklist-text";
-    const frSpan = document.createElement("span");
-    frSpan.className = "checklist-fr";
-    frSpan.textContent = fr;
-    const enSpan = document.createElement("span");
-    enSpan.className = "checklist-en";
-    enSpan.textContent = en;
-    textWrap.appendChild(frSpan);
-    textWrap.appendChild(enSpan);
+    const span = document.createElement("span");
+    span.textContent = step;
     li.appendChild(checkbox);
-    li.appendChild(textWrap);
+    li.appendChild(span);
     checklistEl.appendChild(li);
   });
-  updateChecklistProgress(day);
 
   document.getElementById("speak-prompt").onclick = () => speak(prompt);
 }

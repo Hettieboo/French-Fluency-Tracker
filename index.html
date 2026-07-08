@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google" content="notranslate">
-<title>French Learning App — 60 jours de français</title>
+<title>Carnet — 60 jours de français</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,72,400;0,72,600;1,72,500&family=Inter:wght@400;500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
@@ -16,9 +16,9 @@
   <div class="margin-rule"></div>
 
   <header class="page-header">
-    <p class="eyebrow">french learning app</p>
+    <p class="eyebrow">carnet de bord</p>
     <h1>60 jours de français</h1>
-    <p class="subtitle">Apprends à parler naturellement avec ta famille. Pas pour un examen. Pour la vraie vie.</p>
+    <p class="subtitle">Pour parler en famille — pas pour un examen.</p>
   </header>
 
   <nav class="tabs" id="tabs">
@@ -34,37 +34,20 @@
     <section id="today" class="panel active">
       <div class="stamp" id="day-stamp">Jour 1</div>
       <div class="today-grid">
-        <div class="today-main" id="today-main" style="--block-color: #5B8DB8;">
+        <div class="today-main">
           <h2 id="block-title">—</h2>
           <p class="meta"><strong>Grammaire :</strong> <span id="block-grammar"></span></p>
+          <p class="meta"><strong>Vocabulaire :</strong> <span id="block-vocab"></span></p>
 
-          <div id="prompt-section">
-            <div class="prompt-box">
-              <p class="prompt-label">🎤 Mission du jour</p>
-              <p class="prompt-text" id="today-prompt"></p>
-              <button class="speak-btn small" id="speak-prompt">🔊 écouter</button>
-            </div>
+          <div id="conjugation-tables"></div>
+
+          <div class="prompt-box">
+            <p class="prompt-label">Aujourd'hui, tu parles de…</p>
+            <p class="prompt-text" id="today-prompt"></p>
+            <button class="speak-btn small" id="speak-prompt">🔊 écouter</button>
           </div>
 
-          <div id="learning-section">
-            <div id="conjugation-tables"></div>
-
-            <h4 class="learning-subhead" id="today-vocab-examples-heading">Exemples de grammaire</h4>
-            <div id="today-vocab-examples" class="example-sentence-list"></div>
-
-            <h4 class="learning-subhead" id="today-dialogue-heading">Mini dialogue</h4>
-            <div id="today-dialogue" class="dialogue-box"></div>
-
-            <h4 class="learning-subhead" id="today-listening-heading">Écoute et répète (x2)</h4>
-            <div id="today-listening" class="example-sentence-list"></div>
-
-            <div id="today-notice" class="notice-box"></div>
-          </div>
-
-          <h3>
-            Séance du jour (20–28 min)
-            <span class="checklist-progress" id="checklist-progress">0/4</span>
-          </h3>
+          <h3>Séance du jour (20–28 min)</h3>
           <ul class="checklist" id="session-checklist"></ul>
 
           <h3>Tes notes / ta réponse du jour</h3>
@@ -72,14 +55,11 @@
 
           <div class="day-controls">
             <button class="primary-btn" id="complete-day-btn">Marquer le jour terminé →</button>
-            <details class="day-jump">
-              <summary>Aller à un autre jour</summary>
-              <div class="day-jump-inner">
-                <label for="jump-input">Jour</label>
-                <input type="number" id="jump-input" min="1" max="60" value="1">
-                <button id="jump-btn">OK</button>
-              </div>
-            </details>
+            <div class="day-jump">
+              <label for="jump-input">Aller au jour</label>
+              <input type="number" id="jump-input" min="1" max="60" value="1">
+              <button id="jump-btn">OK</button>
+            </div>
           </div>
         </div>
         <div class="today-side">

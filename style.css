@@ -8,10 +8,6 @@
   --accent: #2c5f8a;
   --accent-soft: #e3edf5;
   --stamp-green: #4f7942;
-  --warm-complete: #c1763f;
-  --warm-complete-hover: #a8632f;
-  --notice-gold: #b8862f;
-  --notice-gold-soft: #f7efdd;
   --shadow: rgba(31, 42, 68, 0.10);
   --radius: 6px;
 }
@@ -143,9 +139,6 @@ h3 {
   font-size: 18px;
   font-weight: 600;
   margin: 24px 0 10px;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
 }
 
 .intro-text { color: var(--ink-soft); font-size: 14px; margin-bottom: 22px; }
@@ -173,18 +166,10 @@ h3 {
   gap: 32px;
 }
 
-/* Per-block colour band: a soft left border that tints as you move through
-   phases of the program (present → blue, passé composé → amber, etc.) */
-.today-main {
-  border-left: 4px solid var(--block-color, var(--accent));
-  padding-left: 20px;
-}
-
 @media (max-width: 640px) {
   .today-grid { grid-template-columns: 1fr; }
   .notebook { padding: 32px 24px 32px 56px; }
   .margin-rule { left: 32px; }
-  .today-main { padding-left: 14px; }
 }
 
 .meta { font-size: 14px; margin: 4px 0; color: var(--ink-soft); }
@@ -195,8 +180,31 @@ h3 {
   border-left: 3px solid var(--accent);
   border-radius: var(--radius);
   padding: 16px 18px;
+  margin: 18px 0;
+}
+
+/* ===== Conjugation tables ===== */
+.conj-table {
+  background: white;
+  border: 1px solid var(--grid-line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
   margin: 14px 0;
 }
+.conj-table h4 {
+  font-family: 'Caveat', cursive;
+  font-size: 19px;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+.conj-table table { width: 100%; border-collapse: collapse; }
+.conj-table tr { border-bottom: 1px dashed var(--grid-line); }
+.conj-table tr:last-child { border-bottom: none; }
+.conj-pronoun { padding: 6px 8px 6px 0; color: var(--ink-soft); font-size: 14px; width: 40%; }
+.conj-form { padding: 6px 8px; font-weight: 600; font-size: 14.5px; }
+.conj-table .speak-btn { width: 28px; height: 28px; font-size: 12px; }
+.conj-meaning { font-size: 13px; color: var(--accent); font-weight: 600; margin: 0 0 8px; }
+.conj-note { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; font-style: italic; }
 
 .prompt-label {
   font-family: 'Caveat', cursive;
@@ -206,186 +214,6 @@ h3 {
 }
 
 .prompt-text { margin: 0 0 10px; font-size: 16px; }
-
-/* ===== Today's focus vocab chips ===== */
-.vocab-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0 0 18px;
-}
-.vocab-chip-row:empty { display: none; }
-
-.vocab-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: white;
-  border: 1px solid var(--grid-line);
-  border-radius: 16px;
-  padding: 5px 6px 5px 12px;
-  font-size: 13.5px;
-}
-.vocab-chip .chip-fr { font-weight: 600; }
-.vocab-chip .chip-en { color: var(--ink-soft); font-size: 12px; margin-left: 4px; }
-.vocab-chip button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-}
-.vocab-chip button:hover { background: var(--accent-soft); }
-
-/* ===== Learning-section sub-headings (Grammar examples / Mini dialogue / Écoute) ===== */
-.learning-subhead {
-  font-family: 'Caveat', cursive;
-  font-weight: 600;
-  font-size: 19px;
-  color: var(--ink-soft);
-  margin: 22px 0 8px;
-  display: block;
-}
-/* Hide a subhead whenever its content div right after it is empty — the
-   heading and the list are toggled together from script.js. */
-
-/* ===== Today's example sentences ===== */
-.example-sentence-list { margin: 0 0 6px; }
-.example-sentence-list:empty { display: none; }
-
-.example-sentence {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: white;
-  border: 1px solid var(--grid-line);
-  border-radius: var(--radius);
-  padding: 10px 12px;
-  margin-bottom: 8px;
-}
-.example-sentence-text { flex: 1; }
-.ex-fr { display: block; font-weight: 600; font-size: 14.5px; }
-.ex-en { display: block; color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
-
-/* ===== Mini dialogue (chat-bubble style, A left / B right) ===== */
-.dialogue-box { margin: 0 0 6px; display: flex; flex-direction: column; gap: 8px; }
-.dialogue-box:empty { display: none; }
-
-.dialogue-line { display: flex; }
-.dialogue-line.speaker-a { justify-content: flex-start; }
-.dialogue-line.speaker-b { justify-content: flex-end; }
-
-.dialogue-bubble {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 82%;
-  border-radius: 14px;
-  padding: 9px 12px;
-  border: 1px solid var(--grid-line);
-}
-.dialogue-line.speaker-a .dialogue-bubble {
-  background: white;
-  border-top-left-radius: 4px;
-}
-.dialogue-line.speaker-b .dialogue-bubble {
-  background: var(--accent-soft);
-  border-top-right-radius: 4px;
-}
-
-.dialogue-speaker {
-  font-family: 'Caveat', cursive;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--accent);
-  flex-shrink: 0;
-  width: 16px;
-  text-align: center;
-}
-.dialogue-text { flex: 1; }
-.dialogue-text .ex-fr { font-size: 14px; }
-.dialogue-text .ex-en { font-size: 12px; }
-
-@media (max-width: 640px) {
-  .dialogue-bubble { max-width: 92%; }
-}
-
-/* ===== "Did you notice?" callout ===== */
-.notice-box {
-  background: var(--notice-gold-soft);
-  border-left: 3px solid var(--notice-gold);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin: 16px 0 6px;
-}
-.notice-box:empty { display: none; }
-.notice-label {
-  font-family: 'Caveat', cursive;
-  font-size: 18px;
-  color: var(--notice-gold);
-  margin: 0 0 4px;
-}
-.notice-text { margin: 0; font-size: 13.5px; color: var(--ink); line-height: 1.5; }
-
-/* ===== Conjugation tables ===== */
-#conjugation-tables { margin-bottom: 6px; }
-
-.conj-table {
-  background: white;
-  border: 1px solid var(--grid-line);
-  border-radius: var(--radius);
-  padding: 0;
-  margin: 14px 0;
-  overflow: hidden;
-}
-.conj-table > summary,
-.conj-table > .conj-table-header {
-  font-family: 'Caveat', cursive;
-  font-size: 19px;
-  color: var(--accent);
-  padding: 12px 16px;
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.conj-table > summary::-webkit-details-marker { display: none; }
-.conj-table > summary::after {
-  content: "▾";
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  color: var(--ink-soft);
-  transition: transform 0.15s ease;
-}
-.conj-table[open] > summary::after { transform: rotate(180deg); }
-
-.conj-table-body { padding: 0 16px 14px; }
-.conj-table table { width: 100%; border-collapse: collapse; }
-.conj-table tr { border-bottom: 1px dashed var(--grid-line); }
-.conj-table tr:last-child { border-bottom: none; }
-.conj-pronoun { padding: 6px 8px 6px 0; color: var(--ink-soft); font-size: 14px; width: 40%; }
-.conj-form { padding: 6px 8px; font-weight: 600; font-size: 14.5px; }
-.conj-table .speak-btn { width: 28px; height: 28px; font-size: 12px; }
-.conj-note { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; font-style: italic; }
-
-/* ===== Checklist with progress counter ===== */
-.checklist-progress {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border-radius: 12px;
-  padding: 2px 10px;
-}
-.checklist-progress.complete {
-  color: white;
-  background: var(--stamp-green);
-}
 
 .checklist { list-style: none; padding: 0; margin: 0; }
 .checklist li {
@@ -397,11 +225,6 @@ h3 {
   font-size: 14px;
 }
 .checklist li input { margin-top: 3px; accent-color: var(--accent); }
-.checklist-text { display: flex; flex-direction: column; }
-.checklist-fr { font-weight: 500; color: var(--ink); }
-.checklist-en { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
-.checklist li.step-done .checklist-fr,
-.checklist li.step-done .checklist-en { color: var(--ink-soft); text-decoration: line-through; }
 
 .notes-pad {
   width: 100%;
@@ -426,51 +249,29 @@ h3 {
 }
 .notes-pad:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-/* ===== Day controls ===== */
 .day-controls {
   margin-top: 24px;
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .primary-btn {
-  width: 100%;
-  background: var(--warm-complete);
-  color: white;
+  background: var(--ink);
+  color: var(--paper);
   border: none;
-  padding: 16px 20px;
+  padding: 12px 20px;
   border-radius: var(--radius);
   font-family: 'Inter', sans-serif;
   font-weight: 600;
-  font-size: 15.5px;
+  font-size: 14px;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
-  box-shadow: 0 4px 14px rgba(193, 118, 63, 0.28);
+  transition: background 0.15s ease;
 }
-.primary-btn:hover { background: var(--warm-complete-hover); }
-.primary-btn:active { transform: scale(0.99); }
+.primary-btn:hover { background: var(--accent); }
 
-/* Jump-to-day tucked into a low-emphasis disclosure, since it's used rarely */
-.day-jump {
-  align-self: flex-start;
-  font-size: 13px;
-  color: var(--ink-soft);
-}
-.day-jump summary {
-  cursor: pointer;
-  list-style: none;
-  color: var(--ink-soft);
-  text-decoration: underline dashed;
-  text-decoration-color: var(--grid-line);
-}
-.day-jump summary::-webkit-details-marker { display: none; }
-.day-jump-inner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
+.day-jump { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
 .day-jump input {
   width: 56px;
   padding: 6px 8px;
@@ -486,10 +287,6 @@ h3 {
   cursor: pointer;
 }
 
-@media (max-width: 640px) {
-  .day-controls { gap: 10px; }
-}
-
 .today-side {
   background: white;
   border: 1px solid var(--grid-line);
@@ -499,12 +296,8 @@ h3 {
   align-self: start;
 }
 .side-label { font-size: 12px; color: var(--ink-soft); margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.04em; }
-.streak-number { font-family: 'Newsreader', serif; font-size: 56px; margin: 0; color: var(--stamp-green); line-height: 1; }
-.side-sub { font-size: 12px; color: var(--ink-soft); margin: 6px 0 0; }
-
-@media (max-width: 640px) {
-  .streak-number { font-size: 48px; }
-}
+.streak-number { font-family: 'Newsreader', serif; font-size: 44px; margin: 0; color: var(--stamp-green); }
+.side-sub { font-size: 12px; color: var(--ink-soft); margin: 4px 0 0; }
 
 /* ===== Vocab & phrases ===== */
 .category-block { margin-bottom: 26px; }
