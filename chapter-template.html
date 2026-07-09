@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
+<title>Chapitre N — TITRE | 60 jours de français</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="engine.css">
+</head>
+<body>
+<div class="sjf-root" id="sjf-root"></div>
+<script src="engine.js"></script>
+<script>
+SJF.render(document.getElementById('sjf-root'), {
+  number: 5,                              // ← chapter number
+  title: "Titre du chapitre",             // ← chapter title in French
+  subtitle: "Une phrase qui résume.",     // ← one-line subtitle in French
+  nextChapterLabel: "Chapitre 6 — Titre — arrive bientôt.", // ← or "" if last
+  story: [
+    // Each block is either a paragraph (t:'p') or dialogue (t:'d').
+    // For paragraphs:
+    { t:'p', fr:"Texte français.", en:"English text." },
+    // For dialogue (s = speaker name):
+    { t:'d', s:'Lucas', fr:"Ce que Lucas dit.", en:"What Lucas says." },
+    { t:'d', s:'Élise', fr:"Ce qu'Élise répond.", en:"What Élise answers." },
+    // Add as many blocks as you need — no limit.
+  ]
+});
+</script>
+</body>
+</html>
