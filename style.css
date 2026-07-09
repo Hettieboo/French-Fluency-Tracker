@@ -183,7 +183,46 @@ h3 {
   margin: 18px 0;
 }
 
-/* ===== Conjugation tables ===== */
+/* ===== Chapter banner (days 51-60) ===== */
+.chapter-banner {
+  background: linear-gradient(135deg, #1B2438 0%, #2A3550 100%);
+  border: 1px solid #3a4a6a;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin: 16px 0;
+  color: #F2EAD8;
+}
+.chapter-banner--soon { opacity: 0.65; }
+.chapter-banner-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #D4A93E;
+  margin-bottom: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+.chapter-banner-title {
+  font-family: 'Newsreader', serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: #F2EAD8;
+}
+.chapter-coming { font-style: italic; font-size: 16px; color: #B9C0D4; margin-bottom: 0; }
+.chapter-banner-btn {
+  display: inline-block;
+  background: #D4A93E;
+  color: #1B2438;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.chapter-banner-btn:hover { background: #e0bc5a; }
 .conj-table {
   background: white;
   border: 1px solid var(--grid-line);
