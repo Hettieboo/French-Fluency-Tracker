@@ -99,38 +99,94 @@ function computeStreak() {
   return streak;
 }
 
+/* ---------- Helpers ---------- */
+
+// Look up a VOCAB entry by its French headword (exact match against the fr
+// column across all categories). Returns [fr, en] or null if not found.
+function findVocabEntry(frTerm) {
+  for (const words of Object.values(VOCAB)) {
+    const hit = words.find(([fr]) => fr === frTerm);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function updateChecklistProgress(day) {
+  const state = getChecklistState(day);
+  const total = SESSION_TEMPLATE.length;
+  const done = state.filter(Boolean).length;
+  const el = document.getElementById("checklist-progress");
+  el.textContent = `${done}/${total}`;
+  el.classList.toggle("complete", done === total);
+}
+
 /* ---------- Rendering: Today ---------- */
 
 function renderToday() {
   const day = getCurrentDay();
   const block = getBlockForDay(day);
-  const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, tables: [], prompt: block.prompts[0] };
+  const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, vocabWords: [], tables: [], prompt: block.prompts[0] };
   const prompt = detail.prompt;
 
   document.getElementById("day-stamp").textContent = `Jour ${day}`;
   document.getElementById("block-title").textContent = `${block.title} (jours ${block.range[0]}–${block.range[1]})`;
   document.getElementById("block-grammar").textContent = detail.grammar;
-  document.getElementById("block-vocab").textContent = detail.vocab;
   document.getElementById("today-prompt").textContent = prompt;
   document.getElementById("streak-number").textContent = computeStreak();
   document.getElementById("jump-input").value = day;
+  document.getElementById("today-main").style.setProperty("--block-color", block.color || "#2c5f8a");
 
+  // Section order: on teaching days, show the grammar/examples first so the
+  // learner has the tool before being asked to produce something with it.
+  // On review days, the learner already knows the material, so the prompt
+  // (retrieval practice) comes first and reference tables stay below it.
+  const promptSection = document.getElementById("prompt-section");
+  const learningSection = document.getElementById("learning-section");
+  const container = promptSection.parentNode;
+  const isReviewDay = REVIEW_DAYS.includes(day);
+  if (isReviewDay) {
+    container.insertBefore(promptSection, learningSection);
+  } else {
+    container.insertBefore(learningSection, promptSection);
+  }
+
+  // Example sentences for today's vocab — one per word, using only grammar
+  // taught up to this day, each with its own TTS button.
+  const examplesEl = document.getElementById("today-vocab-examples");
+  examplesEl.innerHTML = "";
+  (detail.vocabExamples || []).forEach(([fr, en]) => {
+    const row = document.createElement("div");
+    row.className = "example-sentence";
+    const left = document.createElement("div");
+    left.className = "example-sentence-text";
+    left.innerHTML = `<span class="ex-fr">${fr}</span><span class="ex-en">${en}</span>`;
+    const btn = document.createElement("button");
+    btn.className = "speak-btn";
+    btn.textContent = "🔊";
+    btn.setAttribute("aria-label", `Écouter : ${fr}`);
+    btn.onclick = () => speak(fr);
+    row.appendChild(left);
+    row.appendChild(btn);
+    examplesEl.appendChild(row);
+  });
+
+  // Conjugation tables — collapsible <details>, closed by default on heavy
+  // review days so the page doesn't open as a wall of grids.
   const tablesEl = document.getElementById("conjugation-tables");
   tablesEl.innerHTML = "";
   (detail.tables || []).forEach(table => {
-    const card = document.createElement("div");
-    card.className = "conj-table";
-    const h4 = document.createElement("h4");
-    h4.textContent = table.title;
-    card.appendChild(h4);
-    if (table.meaning) {
-      const meaning = document.createElement("p");
-      meaning.className = "conj-meaning";
-      meaning.textContent = "→ " + table.meaning;
-      card.appendChild(meaning);
-    }
-    const tableEl = document.createElement("table");
+    const details = document.createElement("details");
+    details.className = "conj-table";
+    if (!isReviewDay) details.setAttribute("open", "");
 
+    const summary = document.createElement("summary");
+    summary.textContent = table.title;
+    details.appendChild(summary);
+
+    const body = document.createElement("div");
+    body.className = "conj-table-body";
+
+    const tableEl = document.createElement("table");
     table.rows.forEach(([pronoun, form]) => {
       const tr = document.createElement("tr");
       const tdP = document.createElement("td");
@@ -158,52 +214,54 @@ function renderToday() {
       tr.appendChild(tdBtn);
       tableEl.appendChild(tr);
     });
-    card.appendChild(tableEl);
+    body.appendChild(tableEl);
+
     if (table.note) {
       const note = document.createElement("p");
       note.className = "conj-note";
       note.textContent = table.note;
-      card.appendChild(note);
+      body.appendChild(note);
     }
-    tablesEl.appendChild(card);
+
+    details.appendChild(body);
+    tablesEl.appendChild(details);
   });
 
+
   // Chapter banner (days 51-60)
-  const bannerEl = document.getElementById("chapter-banner");
+  const bannerEl = document.getElementById('chapter-banner');
   if (bannerEl) {
-    bannerEl.innerHTML = "";
+    bannerEl.innerHTML = '';
     if (detail.chapter) {
       const ch = detail.chapter;
-      const banner = document.createElement("div");
-      banner.className = "chapter-banner";
+      const banner = document.createElement('div');
+      banner.className = 'chapter-banner';
       if (ch.file) {
         banner.innerHTML = `
-          <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
-          <div class="chapter-banner-title">${ch.title}</div>
-          <a class="chapter-banner-btn" href="${ch.file}" target="_blank">Lire le chapitre ${ch.n} →</a>
+          <div class='chapter-banner-label'>📖 Histoire du jour — Chapitre ${ch.n}</div>
+          <div class='chapter-banner-title'>${ch.title}</div>
+          <a class='chapter-banner-btn' href='${ch.file}' target='_blank'>Lire le chapitre ${ch.n} →</a>
         `;
       } else {
         banner.innerHTML = `
-          <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
-          <div class="chapter-banner-title chapter-coming">À venir — en cours d'écriture</div>
+          <div class='chapter-banner-label'>📖 Histoire du jour — Chapitre ${ch.n}</div>
+          <div class='chapter-banner-title chapter-coming'>À venir — en cours d'écriture</div>
         `;
-        banner.classList.add("chapter-banner--soon");
+        banner.classList.add('chapter-banner--soon');
       }
       bannerEl.appendChild(banner);
     }
   }
-
   const notesEl = document.getElementById("day-notes");
-  if (notesEl) {
-    notesEl.value = getNotes(day);
-    notesEl.oninput = () => setNotes(day, notesEl.value);
-  }
+  notesEl.value = getNotes(day);
+  notesEl.oninput = () => setNotes(day, notesEl.value);
 
   const checklistEl = document.getElementById("session-checklist");
   const savedState = getChecklistState(day);
   checklistEl.innerHTML = "";
-  SESSION_TEMPLATE.forEach((step, i) => {
+  SESSION_TEMPLATE.forEach(([fr, en], i) => {
     const li = document.createElement("li");
+    if (savedState[i]) li.classList.add("step-done");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = !!savedState[i];
@@ -211,13 +269,24 @@ function renderToday() {
       const state = getChecklistState(day);
       state[i] = checkbox.checked;
       setChecklistState(day, state);
+      li.classList.toggle("step-done", checkbox.checked);
+      updateChecklistProgress(day);
     });
-    const span = document.createElement("span");
-    span.textContent = step;
+    const textWrap = document.createElement("span");
+    textWrap.className = "checklist-text";
+    const frSpan = document.createElement("span");
+    frSpan.className = "checklist-fr";
+    frSpan.textContent = fr;
+    const enSpan = document.createElement("span");
+    enSpan.className = "checklist-en";
+    enSpan.textContent = en;
+    textWrap.appendChild(frSpan);
+    textWrap.appendChild(enSpan);
     li.appendChild(checkbox);
-    li.appendChild(span);
+    li.appendChild(textWrap);
     checklistEl.appendChild(li);
   });
+  updateChecklistProgress(day);
 
   document.getElementById("speak-prompt").onclick = () => speak(prompt);
 }

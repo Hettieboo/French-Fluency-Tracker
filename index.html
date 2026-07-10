@@ -34,22 +34,27 @@
     <section id="today" class="panel active">
       <div class="stamp" id="day-stamp">Jour 1</div>
       <div class="today-grid">
-        <div class="today-main">
+        <div class="today-main" id="today-main">
           <h2 id="block-title">—</h2>
           <p class="meta"><strong>Grammaire :</strong> <span id="block-grammar"></span></p>
-          <p class="meta"><strong>Vocabulaire :</strong> <span id="block-vocab"></span></p>
 
-          <div id="conjugation-tables"></div>
+          <!-- learning-section and prompt-section are reordered by script on review days -->
+          <div id="learning-section">
+            <div id="today-vocab-examples"></div>
+            <div id="conjugation-tables"></div>
+          </div>
+
+          <div id="prompt-section">
+            <div class="prompt-box">
+              <p class="prompt-label">Aujourd'hui, tu parles de…</p>
+              <p class="prompt-text" id="today-prompt"></p>
+              <button class="speak-btn small" id="speak-prompt">🔊 écouter</button>
+            </div>
+          </div>
 
           <div id="chapter-banner"></div>
 
-          <div class="prompt-box">
-            <p class="prompt-label">Aujourd'hui, tu parles de…</p>
-            <p class="prompt-text" id="today-prompt"></p>
-            <button class="speak-btn small" id="speak-prompt">🔊 écouter</button>
-          </div>
-
-          <h3>Séance du jour (20–28 min)</h3>
+          <h3>Séance du jour (20–28 min) <span class="checklist-progress" id="checklist-progress">0/4</span></h3>
           <ul class="checklist" id="session-checklist"></ul>
 
           <h3>Tes notes / ta réponse du jour</h3>

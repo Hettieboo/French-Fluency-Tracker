@@ -183,6 +183,19 @@ h3 {
   margin: 18px 0;
 }
 
+/* ===== Example sentences ===== */
+#example-sentences h3 { margin-top: 20px; }
+.sentence-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--grid-line);
+}
+.sentence-left { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sentence-fr { font-size: 15px; font-weight: 600; color: var(--ink); }
+.sentence-en { font-size: 13px; color: var(--ink-soft); }
+
 /* ===== Chapter banner (days 51-60) ===== */
 .chapter-banner {
   background: linear-gradient(135deg, #1B2438 0%, #2A3550 100%);
@@ -445,3 +458,54 @@ h3 {
   color: var(--ink-soft);
   margin-top: 36px;
 }
+
+/* ===== Example sentences (today-vocab-examples) ===== */
+.example-sentence {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--grid-line);
+}
+.example-sentence-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.ex-fr { font-size: 15px; font-weight: 600; color: var(--ink); }
+.ex-en { font-size: 13px; color: var(--ink-soft); }
+
+/* ===== Checklist progress counter ===== */
+.checklist-progress {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 10px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.checklist-progress.complete { background: #e8f5e9; color: #2e7d32; }
+
+/* ===== Bilingual checklist items ===== */
+.checklist-text { display: flex; flex-direction: column; gap: 1px; }
+.checklist-fr { font-size: 14px; font-weight: 600; color: var(--ink); }
+.checklist-en { font-size: 12px; color: var(--ink-soft); }
+.step-done .checklist-fr { text-decoration: line-through; opacity: 0.6; }
+
+/* ===== Collapsible conjugation tables (details/summary) ===== */
+details.conj-table { border: 1px solid var(--grid-line); border-radius: var(--radius); margin: 10px 0; background: white; }
+details.conj-table summary {
+  font-family: 'Caveat', cursive;
+  font-size: 19px;
+  color: var(--accent);
+  padding: 10px 14px;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+details.conj-table summary::-webkit-details-marker { display: none; }
+details.conj-table summary::before { content: '▸ '; font-size: 14px; }
+details[open].conj-table summary::before { content: '▾ '; }
+.conj-table-body { padding: 4px 14px 12px; }
+
+/* ===== Block color accent ===== */
+#today-main { border-top: 3px solid var(--block-color, #2c5f8a); }
