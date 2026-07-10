@@ -170,30 +170,34 @@ function renderToday() {
 
   // Chapter banner (days 51-60)
   const bannerEl = document.getElementById("chapter-banner");
-  bannerEl.innerHTML = "";
-  if (detail.chapter) {
-    const ch = detail.chapter;
-    const banner = document.createElement("div");
-    banner.className = "chapter-banner";
-    if (ch.file) {
-      banner.innerHTML = `
-        <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
-        <div class="chapter-banner-title">${ch.title}</div>
-        <a class="chapter-banner-btn" href="${ch.file}" target="_blank">Lire le chapitre ${ch.n} →</a>
-      `;
-    } else {
-      banner.innerHTML = `
-        <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
-        <div class="chapter-banner-title chapter-coming">À venir — en cours d'écriture</div>
-      `;
-      banner.classList.add("chapter-banner--soon");
+  if (bannerEl) {
+    bannerEl.innerHTML = "";
+    if (detail.chapter) {
+      const ch = detail.chapter;
+      const banner = document.createElement("div");
+      banner.className = "chapter-banner";
+      if (ch.file) {
+        banner.innerHTML = `
+          <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
+          <div class="chapter-banner-title">${ch.title}</div>
+          <a class="chapter-banner-btn" href="${ch.file}" target="_blank">Lire le chapitre ${ch.n} →</a>
+        `;
+      } else {
+        banner.innerHTML = `
+          <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
+          <div class="chapter-banner-title chapter-coming">À venir — en cours d'écriture</div>
+        `;
+        banner.classList.add("chapter-banner--soon");
+      }
+      bannerEl.appendChild(banner);
     }
-    bannerEl.appendChild(banner);
   }
 
-
-  notesEl.value = getNotes(day);
-  notesEl.oninput = () => setNotes(day, notesEl.value);
+  const notesEl = document.getElementById("day-notes");
+  if (notesEl) {
+    notesEl.value = getNotes(day);
+    notesEl.oninput = () => setNotes(day, notesEl.value);
+  }
 
   const checklistEl = document.getElementById("session-checklist");
   const savedState = getChecklistState(day);
