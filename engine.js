@@ -95,21 +95,26 @@ const VOCAB = [
 ].sort((a, b) => b[0].length - a[0].length);
 
 // ── Vocab highlighter ──────────────────────────────────────────
+// Note: deliberately avoids regex lookbehind ((?<!...)) — some browsers
+// (older Safari/iOS, some Android webviews) throw a SyntaxError on it,
+// which would silently kill the whole render before any story text is
+// appended. A leading capture group + manual re-insertion does the same
+// job and works everywhere.
 function highlight(text, counts) {
   const placeholders = [];
   let result = text;
   for (const [term, en] of VOCAB) {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const re = new RegExp(
-      "(?<![A-Za-zÀ-ÖØ-öø-ÿ'\u2019-])(" + escaped + ")(?![A-Za-zÀ-ÖØ-öø-ÿ'\u2019-])",
+      "(^|[^A-Za-zÀ-ÖØ-öø-ÿ'\u2019-])(" + escaped + ")(?![A-Za-zÀ-ÖØ-öø-ÿ'\u2019-])",
       "gi"
     );
-    result = result.replace(re, (m) => {
+    result = result.replace(re, (m, pre, word) => {
       counts[term] = counts[term] || { en, n: 0 };
       counts[term].n++;
       const idx = placeholders.length;
-      placeholders.push('<span class="voc" title="' + en + '">' + m + '</span>');
-      return '\u0000' + idx + '\u0000';
+      placeholders.push('<span class="voc" title="' + en + '">' + word + '</span>');
+      return pre + '\u0000' + idx + '\u0000';
     });
   }
   return result.replace(/\u0000(\d+)\u0000/g, (_, i) => placeholders[i]);
