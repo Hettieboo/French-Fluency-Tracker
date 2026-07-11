@@ -166,22 +166,22 @@ function ensureParticipleStyles() {
   const style = document.createElement("style");
   style.id = "participle-lesson-styles";
   style.textContent = `
-    .participle-lesson-box { margin: 1rem 0 1.5rem; padding: 1rem 1.1rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 10px; background: rgba(0,0,0,0.025); }
-    .participle-lesson-box h4 { margin: 0 0 0.5rem; }
-    .participle-lesson-box > p { margin: 0 0 0.75rem; opacity: 0.9; }
+    .participle-lesson-box { margin: 1rem 0 1.5rem; padding: 1rem 1.1rem; border: 1px solid var(--grid-line, rgba(0,0,0,0.12)); border-radius: 10px; background: var(--paper-alt, rgba(0,0,0,0.025)); }
+    .participle-lesson-box h4 { margin: 0 0 0.5rem; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--notice-gold, var(--accent, #D9AE45)); }
+    .participle-lesson-box > p { margin: 0 0 0.75rem; color: var(--ink, inherit); opacity: 0.9; font-size: 13.5px; line-height: 1.55; }
     .pair-table-wrap { overflow-x: auto; margin: 0.5rem 0 1rem; }
     table.pair-table { width: 100%; border-collapse: collapse; font-size: 0.95em; }
-    table.pair-table th { text-align: left; padding: 0.3rem 0.5rem; font-weight: 600; opacity: 0.65; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.02em; }
-    table.pair-table th .pair-th-en { display: block; text-transform: none; font-weight: 400; font-size: 0.85em; letter-spacing: normal; opacity: 0.75; margin-top: 0.1rem; }
-    table.pair-table td { padding: 0.35rem 0.5rem; border-top: 1px solid rgba(0,0,0,0.07); vertical-align: middle; }
+    table.pair-table th { text-align: left; padding: 0.3rem 0.5rem; font-weight: 600; color: var(--ink-soft, inherit); opacity: 0.85; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.02em; }
+    table.pair-table th .pair-th-en { display: block; text-transform: none; font-weight: 400; font-size: 0.85em; letter-spacing: normal; opacity: 0.85; margin-top: 0.1rem; }
+    table.pair-table td { padding: 0.35rem 0.5rem; border-top: 1px solid var(--grid-line, rgba(0,0,0,0.07)); vertical-align: middle; color: var(--ink, inherit); }
     table.pair-table td.pair-word { font-weight: 500; }
-    table.pair-table td.pair-word .pair-gloss { display: block; font-weight: 400; font-size: 0.8em; opacity: 0.65; margin-top: 0.1rem; }
+    table.pair-table td.pair-word .pair-gloss { display: block; font-weight: 400; font-size: 0.8em; color: var(--ink-soft, inherit); opacity: 0.85; margin-top: 0.1rem; }
     table.pair-table button.speak-btn.small { padding: 0.1rem 0.4rem; font-size: 0.85em; }
-    .participle-rule { font-weight: 600; margin: 0.85rem 0 0.5rem; }
+    .participle-rule { font-weight: 600; margin: 0.85rem 0 0.5rem; color: var(--ink, inherit); }
     .participle-examples { margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; }
-    .participle-example { display: flex; align-items: center; gap: 0.5rem; }
-    .participle-example.correct { color: #1a7f37; }
-    .participle-example.incorrect { color: #b3261e; opacity: 0.85; }
+    .participle-example { display: flex; align-items: center; gap: 0.5rem; font-size: 13.5px; }
+    .participle-example.correct { color: var(--stamp-green, #4f9c5c); }
+    .participle-example.incorrect { color: var(--margin-red, #c0392b); opacity: 0.85; }
   `;
   document.head.appendChild(style);
 }
