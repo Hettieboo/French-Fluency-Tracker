@@ -314,6 +314,20 @@ function renderToday() {
   document.getElementById("block-grammar").textContent = detail.grammar;
   document.getElementById("today-prompt").textContent = prompt;
   document.getElementById("prompt-label").textContent = day < 21 ? "🎤 Today's Mission" : "🎤 Mission du jour";
+
+  // English translation of the mission, shown under the French text for
+  // days 1–20 (matching the label). The 🔊 button still reads the French
+  // `prompt` text itself, so pronunciation stays correct regardless.
+  const existingPromptEn = document.getElementById("today-prompt-en");
+  if (existingPromptEn) existingPromptEn.remove();
+  if (day < 21 && detail.promptEn) {
+    const promptEnEl = document.createElement("p");
+    promptEnEl.id = "today-prompt-en";
+    promptEnEl.className = "ex-en";
+    promptEnEl.textContent = detail.promptEn;
+    document.getElementById("today-prompt").insertAdjacentElement("afterend", promptEnEl);
+  }
+
   document.getElementById("streak-number").textContent = computeStreak();
   document.getElementById("jump-input").value = day;
   document.getElementById("today-main").style.setProperty("--block-color", block.color || "#2c5f8a");
@@ -389,6 +403,13 @@ function renderToday() {
     noticeEl.innerHTML = `<p class="notice-label"></p><p class="notice-text"></p>`;
     noticeEl.querySelector(".notice-label").textContent = noticeLabel;
     noticeEl.querySelector(".notice-text").textContent = detail.didYouNotice;
+    if (day < 21 && detail.didYouNoticeEn) {
+      const noticeEnEl = document.createElement("p");
+      noticeEnEl.className = "notice-text ex-en";
+      noticeEnEl.style.marginTop = "6px";
+      noticeEnEl.textContent = detail.didYouNoticeEn;
+      noticeEl.appendChild(noticeEnEl);
+    }
     noticeEl.style.display = "";
   } else {
     noticeEl.innerHTML = "";
