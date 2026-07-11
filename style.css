@@ -1,28 +1,19 @@
-/* ===== Tokens =====
-   Same variable names as before so every rule below still resolves — only
-   the palette, shapes and type treatment changed. Deep navy page, a
-   slightly-lighter navy for cards, gold as the primary accent (CTAs, tabs,
-   focus), coral as the secondary accent (highlights, "did you know" box),
-   sage green reserved for streak/completion so it doesn't compete with gold. */
+/* ===== Tokens ===== */
 :root {
-  --page-bg: #0B0F1C;
-  --paper: #1E2946;         /* card / panel background (was cream paper) */
-  --paper-alt: #26314F;     /* secondary panel / hover / speaker-b bubble */
-  --grid-line: rgba(255, 255, 255, 0.10);
-  --grid-line-strong: rgba(255, 255, 255, 0.18);
-  --margin-red: #E2795A;    /* coral accent */
-  --ink: #F3ECDD;           /* cream headline / primary text */
-  --ink-soft: #9AA3C4;      /* muted secondary text */
-  --accent: #D9AE45;        /* gold — primary interactive accent */
-  --accent-soft: rgba(217, 174, 69, 0.14);
-  --accent-dark: #B98F2E;   /* gold hover/active */
-  --stamp-green: #7FB98A;   /* sage — streak / completion */
-  --warm-complete: #D9AE45;
-  --warm-complete-hover: #C29A38;
-  --notice-gold: #E2795A;   /* coral — "did you know" callout */
-  --notice-gold-soft: rgba(226, 121, 90, 0.13);
-  --shadow: rgba(0, 0, 0, 0.45);
-  --radius: 10px;
+  --paper: #faf7f0;
+  --grid-line: #cfdded;
+  --margin-red: #c0392b;
+  --ink: #1f2a44;
+  --ink-soft: #5b6584;
+  --accent: #2c5f8a;
+  --accent-soft: #e3edf5;
+  --stamp-green: #4f7942;
+  --warm-complete: #c1763f;
+  --warm-complete-hover: #a8632f;
+  --notice-gold: #b8862f;
+  --notice-gold-soft: #f7efdd;
+  --shadow: rgba(31, 42, 68, 0.10);
+  --radius: 6px;
 }
 
 * { box-sizing: border-box; }
@@ -30,7 +21,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--page-bg);
+  background: #e9e4d8;
   color: var(--ink);
   font-family: 'Inter', sans-serif;
 }
@@ -39,58 +30,65 @@ html, body {
   * { transition: none !important; animation: none !important; }
 }
 
-/* ===== Page card ===== */
+/* ===== Notebook page ===== */
 .notebook {
   position: relative;
   max-width: 860px;
   margin: 32px auto 64px;
-  background: var(--paper);
-  border: 1px solid var(--grid-line);
-  box-shadow: 0 20px 60px var(--shadow);
-  border-radius: 16px;
-  padding: 44px 44px 36px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 27px,
+      var(--grid-line) 27px,
+      var(--grid-line) 28px
+    ),
+    var(--paper);
+  box-shadow: 0 12px 40px var(--shadow);
+  border-radius: var(--radius);
+  padding: 48px 48px 40px 84px;
 }
 
-/* The red notebook margin rule is retired with the notebook look. */
-.margin-rule { display: none; }
+.margin-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 56px;
+  width: 2px;
+  background: var(--margin-red);
+  opacity: 0.55;
+}
 
 /* ===== Header ===== */
-.page-header { margin-bottom: 26px; }
+.page-header { margin-bottom: 28px; }
 
 .eyebrow {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin: 0 0 10px;
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  color: var(--margin-red);
+  margin: 0 0 2px;
+  transform: rotate(-1.5deg);
+  display: inline-block;
 }
 
 .page-header h1 {
   font-family: 'Newsreader', serif;
   font-weight: 600;
   font-size: 40px;
-  margin: 0 0 10px;
+  margin: 0 0 6px;
   color: var(--ink);
-  letter-spacing: -0.01em;
 }
 
 .subtitle {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 16px;
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  font-weight: 500;
-  line-height: 1.5;
-  max-width: 46ch;
+  font-size: 15px;
 }
 
 /* ===== Tabs ===== */
 .tabs {
   display: flex;
-  gap: 22px;
+  gap: 6px;
   border-bottom: 1px solid var(--grid-line);
   margin-bottom: 28px;
   flex-wrap: wrap;
@@ -102,21 +100,19 @@ html, body {
   font-weight: 500;
   background: transparent;
   border: none;
-  padding: 10px 2px;
+  padding: 10px 16px;
   cursor: pointer;
   color: var(--ink-soft);
-  border-radius: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
   position: relative;
   top: 1px;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .tab:hover { color: var(--ink); }
 
 .tab.active {
-  color: var(--ink);
-  background: transparent;
+  color: var(--accent);
+  background: var(--accent-soft);
   border-bottom: 2px solid var(--accent);
   font-weight: 600;
 }
@@ -140,17 +136,13 @@ h2 {
   font-size: 26px;
   font-weight: 600;
   margin: 0 0 6px;
-  color: var(--ink);
 }
 
 h3 {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin: 26px 0 12px;
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 24px 0 10px;
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -160,19 +152,19 @@ h3 {
 
 /* ===== Today panel ===== */
 .stamp {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  padding: 7px 16px;
-  margin-bottom: 20px;
+  display: inline-block;
+  font-family: 'Caveat', cursive;
+  font-size: 30px;
+  color: var(--margin-red);
+  border: 2px solid var(--margin-red);
+  border-radius: 50%;
+  width: 92px;
+  height: 92px;
+  line-height: 88px;
+  text-align: center;
+  transform: rotate(-6deg);
+  margin-bottom: 18px;
+  opacity: 0.85;
 }
 
 .today-grid {
@@ -184,14 +176,15 @@ h3 {
 /* Per-block colour band: a soft left border that tints as you move through
    phases of the program (present → blue, passé composé → amber, etc.) */
 .today-main {
-  border-left: 3px solid var(--block-color, var(--accent));
-  padding-left: 22px;
+  border-left: 4px solid var(--block-color, var(--accent));
+  padding-left: 20px;
 }
 
 @media (max-width: 640px) {
   .today-grid { grid-template-columns: 1fr; }
-  .notebook { padding: 30px 22px 28px; border-radius: 14px; }
-  .today-main { padding-left: 16px; }
+  .notebook { padding: 32px 24px 32px 56px; }
+  .margin-rule { left: 32px; }
+  .today-main { padding-left: 14px; }
 }
 
 .meta { font-size: 14px; margin: 4px 0; color: var(--ink-soft); }
@@ -206,16 +199,13 @@ h3 {
 }
 
 .prompt-label {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
   color: var(--accent);
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
 
-.prompt-text { margin: 0 0 10px; font-size: 16px; color: var(--ink); }
+.prompt-text { margin: 0 0 10px; font-size: 16px; }
 
 /* ===== Today's focus vocab chips ===== */
 .vocab-chip-row {
@@ -230,19 +220,18 @@ h3 {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--paper-alt);
+  background: white;
   border: 1px solid var(--grid-line);
   border-radius: 16px;
   padding: 5px 6px 5px 12px;
   font-size: 13.5px;
 }
-.vocab-chip .chip-fr { font-weight: 600; color: var(--ink); }
+.vocab-chip .chip-fr { font-weight: 600; }
 .vocab-chip .chip-en { color: var(--ink-soft); font-size: 12px; margin-left: 4px; }
 .vocab-chip button {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--accent);
   font-size: 12px;
   width: 22px;
   height: 22px;
@@ -252,15 +241,23 @@ h3 {
 
 /* ===== Learning-section sub-headings (Grammar examples / Mini dialogue / Écoute) ===== */
 .learning-subhead {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: 19px;
   color: var(--ink-soft);
-  margin: 24px 0 10px;
+  margin: 22px 0 8px;
   display: block;
 }
+.subhead-en {
+  font-family: 'Inter', sans-serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-left: 8px;
+  opacity: 0.75;
+}
+h3 { flex-wrap: wrap; }
 /* Hide a subhead whenever its content div right after it is empty — the
    heading and the list are toggled together from script.js. */
 
@@ -273,14 +270,14 @@ h3 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  background: var(--paper-alt);
+  background: white;
   border: 1px solid var(--grid-line);
   border-radius: var(--radius);
   padding: 10px 12px;
   margin-bottom: 8px;
 }
 .example-sentence-text { flex: 1; }
-.ex-fr { display: block; font-weight: 600; font-size: 14.5px; color: var(--ink); }
+.ex-fr { display: block; font-weight: 600; font-size: 14.5px; }
 .ex-en { display: block; color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
 
 /* ===== Mini dialogue (chat-bubble style, A left / B right) ===== */
@@ -301,7 +298,7 @@ h3 {
   border: 1px solid var(--grid-line);
 }
 .dialogue-line.speaker-a .dialogue-bubble {
-  background: var(--paper-alt);
+  background: white;
   border-top-left-radius: 4px;
 }
 .dialogue-line.speaker-b .dialogue-bubble {
@@ -310,18 +307,13 @@ h3 {
 }
 
 .dialogue-speaker {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Caveat', cursive;
   font-weight: 700;
-  font-size: 11px;
-  color: var(--page-bg);
-  background: var(--accent);
+  font-size: 15px;
+  color: var(--accent);
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  width: 16px;
+  text-align: center;
 }
 .dialogue-text { flex: 1; }
 .dialogue-text .ex-fr { font-size: 14px; }
@@ -341,21 +333,18 @@ h3 {
 }
 .notice-box:empty { display: none; }
 .notice-label {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
   color: var(--notice-gold);
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
-.notice-text { margin: 0; font-size: 13.5px; color: var(--ink); line-height: 1.55; }
+.notice-text { margin: 0; font-size: 13.5px; color: var(--ink); line-height: 1.5; }
 
 /* ===== Conjugation tables ===== */
 #conjugation-tables { margin-bottom: 6px; }
 
 .conj-table {
-  background: var(--paper-alt);
+  background: white;
   border: 1px solid var(--grid-line);
   border-radius: var(--radius);
   padding: 0;
@@ -364,10 +353,9 @@ h3 {
 }
 .conj-table > summary,
 .conj-table > .conj-table-header {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--ink);
+  font-family: 'Caveat', cursive;
+  font-size: 19px;
+  color: var(--accent);
   padding: 12px 16px;
   cursor: pointer;
   list-style: none;
@@ -380,7 +368,7 @@ h3 {
   content: "▾";
   font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: var(--accent);
+  color: var(--ink-soft);
   transition: transform 0.15s ease;
 }
 .conj-table[open] > summary::after { transform: rotate(180deg); }
@@ -390,9 +378,9 @@ h3 {
 .conj-table tr { border-bottom: 1px dashed var(--grid-line); }
 .conj-table tr:last-child { border-bottom: none; }
 .conj-pronoun { padding: 6px 8px 6px 0; color: var(--ink-soft); font-size: 14px; width: 40%; }
-.conj-form { padding: 6px 8px; font-weight: 600; font-size: 14.5px; color: var(--ink); }
+.conj-form { padding: 6px 8px; font-weight: 600; font-size: 14.5px; }
 .conj-table .speak-btn { width: 28px; height: 28px; font-size: 12px; }
-.conj-note { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; }
+.conj-note { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; font-style: italic; }
 
 /* ===== Checklist with progress counter ===== */
 .checklist-progress {
@@ -403,11 +391,9 @@ h3 {
   background: var(--accent-soft);
   border-radius: 12px;
   padding: 2px 10px;
-  text-transform: none;
-  letter-spacing: normal;
 }
 .checklist-progress.complete {
-  color: var(--page-bg);
+  color: white;
   background: var(--stamp-green);
 }
 
@@ -436,11 +422,18 @@ h3 {
   color: var(--ink);
   border: 1px solid var(--grid-line);
   border-radius: var(--radius);
-  background: var(--paper-alt);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 23px,
+      var(--grid-line) 23px,
+      var(--grid-line) 24px
+    ),
+    white;
   line-height: 24px;
   resize: vertical;
 }
-.notes-pad::placeholder { color: var(--ink-soft); opacity: 0.8; }
 .notes-pad:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 /* ===== Day controls ===== */
@@ -454,16 +447,16 @@ h3 {
 .primary-btn {
   width: 100%;
   background: var(--warm-complete);
-  color: var(--page-bg);
+  color: white;
   border: none;
   padding: 16px 20px;
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-family: 'Inter', sans-serif;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 15.5px;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.1s ease;
-  box-shadow: 0 8px 24px rgba(217, 174, 69, 0.25);
+  box-shadow: 0 4px 14px rgba(193, 118, 63, 0.28);
 }
 .primary-btn:hover { background: var(--warm-complete-hover); }
 .primary-btn:active { transform: scale(0.99); }
@@ -479,7 +472,7 @@ h3 {
   list-style: none;
   color: var(--ink-soft);
   text-decoration: underline dashed;
-  text-decoration-color: var(--grid-line-strong);
+  text-decoration-color: var(--grid-line);
 }
 .day-jump summary::-webkit-details-marker { display: none; }
 .day-jump-inner {
@@ -494,13 +487,10 @@ h3 {
   border: 1px solid var(--grid-line);
   border-radius: var(--radius);
   font-family: 'Inter', sans-serif;
-  background: var(--paper-alt);
-  color: var(--ink);
 }
 .day-jump button {
   border: 1px solid var(--grid-line);
-  background: var(--paper-alt);
-  color: var(--ink);
+  background: white;
   padding: 6px 10px;
   border-radius: var(--radius);
   cursor: pointer;
@@ -511,15 +501,15 @@ h3 {
 }
 
 .today-side {
-  background: var(--paper-alt);
+  background: white;
   border: 1px solid var(--grid-line);
   border-radius: var(--radius);
   padding: 18px;
   text-align: center;
   align-self: start;
 }
-.side-label { font-size: 11px; color: var(--ink-soft); margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.08em; }
-.streak-number { font-family: 'Newsreader', serif; font-size: 56px; margin: 0; color: var(--accent); line-height: 1; }
+.side-label { font-size: 12px; color: var(--ink-soft); margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+.streak-number { font-family: 'Newsreader', serif; font-size: 56px; margin: 0; color: var(--stamp-green); line-height: 1; }
 .side-sub { font-size: 12px; color: var(--ink-soft); margin: 6px 0 0; }
 
 @media (max-width: 640px) {
@@ -539,7 +529,7 @@ h3 {
   font-size: 14.5px;
 }
 
-.word-fr { font-weight: 600; color: var(--ink); }
+.word-fr { font-weight: 600; }
 .word-en { color: var(--ink-soft); font-size: 13.5px; margin-left: 10px; }
 .word-left { flex: 1; }
 
@@ -553,25 +543,24 @@ h3 {
   cursor: pointer;
   font-size: 14px;
   flex-shrink: 0;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease;
 }
-.speak-btn:hover { background: var(--accent); color: var(--page-bg); }
-.speak-btn.small { width: auto; height: auto; border-radius: 999px; padding: 6px 12px; font-size: 13px; }
+.speak-btn:hover { background: var(--accent); color: white; }
+.speak-btn.small { width: auto; height: auto; border-radius: var(--radius); padding: 6px 12px; font-size: 13px; }
 
 .card-list .word-row { padding: 12px 0; }
 
 /* ===== Pronunciation ===== */
 .pattern-card {
-  background: var(--paper-alt);
+  background: white;
   border: 1px solid var(--grid-line);
   border-radius: var(--radius);
   padding: 16px 18px;
   margin-bottom: 14px;
 }
 .pattern-card h4 {
-  font-family: 'Newsreader', serif;
-  font-weight: 600;
-  font-size: 19px;
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
   color: var(--margin-red);
   margin: 0 0 4px;
 }
@@ -585,9 +574,8 @@ h3 {
   border-radius: 16px;
   padding: 5px 10px 5px 12px;
   font-size: 13px;
-  color: var(--ink);
 }
-.example-chip button { background: none; border: none; cursor: pointer; color: var(--accent); font-size: 13px; }
+.example-chip button { background: none; border: none; cursor: pointer; font-size: 13px; }
 
 /* ===== Progress grid ===== */
 .grid-60 {
@@ -603,8 +591,8 @@ h3 {
 .day-cell {
   aspect-ratio: 1;
   border: 1px solid var(--grid-line);
-  border-radius: 50%;
-  background: var(--paper-alt);
+  border-radius: var(--radius);
+  background: white;
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -613,16 +601,16 @@ h3 {
   color: var(--ink-soft);
   transition: transform 0.1s ease;
 }
-.day-cell:hover { transform: scale(1.08); }
-.day-cell.done { background: var(--accent); color: var(--page-bg); border-color: var(--accent); font-weight: 700; }
-.day-cell.current { border: 2px solid var(--accent); color: var(--accent); font-weight: 700; background: var(--accent-soft); }
+.day-cell:hover { transform: scale(1.06); }
+.day-cell.done { background: var(--stamp-green); color: white; border-color: var(--stamp-green); }
+.day-cell.current { border: 2px solid var(--accent); color: var(--accent); font-weight: 700; }
 
 .reset-btn {
   background: none;
   border: 1px solid var(--grid-line);
   color: var(--ink-soft);
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-size: 13px;
   cursor: pointer;
 }
@@ -630,44 +618,54 @@ h3 {
 
 /* ===== Chapter banner (Days 56-60) — links out to the story pages ===== */
 .chapter-banner {
-  background: linear-gradient(135deg, var(--page-bg) 0%, var(--paper-alt) 100%);
-  border: 1px solid var(--grid-line);
+  background: linear-gradient(135deg, #1B2438 0%, #2A3550 100%);
+  border: 1px solid #3a4a6a;
   border-radius: var(--radius);
   padding: 18px 20px;
   margin: 20px 0 6px;
-  color: var(--ink);
+  color: #F2EAD8;
 }
 .chapter-banner--soon { opacity: 0.65; }
 .chapter-banner-label {
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #D4A93E;
   margin-bottom: 6px;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
+}
+.chapter-banner-label-en {
+  display: block;
+  text-transform: none;
+  letter-spacing: normal;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 11px;
+  color: #B9C0D4;
+  margin-top: 3px;
 }
 .chapter-banner-title {
   font-family: 'Newsreader', serif;
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 14px;
-  color: var(--ink);
+  color: #F2EAD8;
 }
-.chapter-coming { font-style: italic; font-size: 16px; color: var(--ink-soft); margin-bottom: 0; }
+.chapter-coming { font-style: italic; font-size: 16px; color: #B9C0D4; margin-bottom: 0; }
 .chapter-banner-btn {
   display: inline-block;
-  background: var(--accent);
-  color: var(--page-bg);
+  background: #D4A93E;
+  color: #1B2438;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 13px;
   padding: 9px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius);
   text-decoration: none;
   transition: background 0.15s ease;
 }
-.chapter-banner-btn:hover { background: var(--accent-dark); }
+.chapter-banner-btn:hover { background: #e0bc5a; }
 
 /* ===== Footer ===== */
 .page-footer {
