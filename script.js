@@ -153,6 +153,154 @@ function renderSentenceList(container, sentences) {
   });
 }
 
+/* ---------- Past-participle concept lesson (Days 21, 22...) ---------- */
+// Renders a boxed, audio-enabled mini-lesson explaining what a past
+// participle is: an infinitive→participle pair table (each word individually
+// clickable), the passé composé rule, an optional helper+participle pair
+// table, and correct/incorrect example contrasts. Fully self-contained: it
+// injects its own styles once and creates its own container, so no HTML/CSS
+// file needs to change. Renders nothing on days without a `participleLesson`.
+
+function ensureParticipleStyles() {
+  if (document.getElementById("participle-lesson-styles")) return;
+  const style = document.createElement("style");
+  style.id = "participle-lesson-styles";
+  style.textContent = `
+    .participle-lesson-box { margin: 1rem 0 1.5rem; padding: 1rem 1.1rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 10px; background: rgba(0,0,0,0.025); }
+    .participle-lesson-box h4 { margin: 0 0 0.5rem; }
+    .participle-lesson-box > p { margin: 0 0 0.75rem; opacity: 0.9; }
+    .pair-table-wrap { overflow-x: auto; margin: 0.5rem 0 1rem; }
+    table.pair-table { width: 100%; border-collapse: collapse; font-size: 0.95em; }
+    table.pair-table th { text-align: left; padding: 0.3rem 0.5rem; font-weight: 600; opacity: 0.65; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.02em; }
+    table.pair-table th .pair-th-en { display: block; text-transform: none; font-weight: 400; font-size: 0.85em; letter-spacing: normal; opacity: 0.75; margin-top: 0.1rem; }
+    table.pair-table td { padding: 0.35rem 0.5rem; border-top: 1px solid rgba(0,0,0,0.07); vertical-align: middle; }
+    table.pair-table td.pair-word { font-weight: 500; }
+    table.pair-table td.pair-word .pair-gloss { display: block; font-weight: 400; font-size: 0.8em; opacity: 0.65; margin-top: 0.1rem; }
+    table.pair-table button.speak-btn.small { padding: 0.1rem 0.4rem; font-size: 0.85em; }
+    .participle-rule { font-weight: 600; margin: 0.85rem 0 0.5rem; }
+    .participle-examples { margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .participle-example { display: flex; align-items: center; gap: 0.5rem; }
+    .participle-example.correct { color: #1a7f37; }
+    .participle-example.incorrect { color: #b3261e; opacity: 0.85; }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureParticipleLessonContainer() {
+  let el = document.getElementById("participle-lesson");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "participle-lesson";
+    const tablesEl = document.getElementById("conjugation-tables");
+    // Insert immediately AFTER the conjugation tables block, so the concept
+    // box appears right under "avoir (conjugué) + participe passé", matching
+    // the requested lesson order.
+    tablesEl.parentNode.insertBefore(el, tablesEl.nextSibling);
+  }
+  return el;
+}
+
+function makeSpeakBtn(text, label) {
+  const btn = document.createElement("button");
+  btn.className = "speak-btn small";
+  btn.textContent = "🔊";
+  btn.setAttribute("aria-label", label || `Écouter : ${text}`);
+  btn.onclick = () => speak(text);
+  return btn;
+}
+
+function renderPairTable(pairs, col1Header, col2Header) {
+  // col1Header/col2Header = { fr, en } — small English subtext under each
+  // French column header. Each row is [word1, word2, glossEn?] — glossEn is
+  // the English meaning of word1 (the infinitive or helper), shown as a
+  // small muted line underneath it, e.g. "être" / "to be".
+  const wrap = document.createElement("div");
+  wrap.className = "pair-table-wrap";
+  const table = document.createElement("table");
+  table.className = "pair-table";
+
+  const headRow = document.createElement("tr");
+  [col1Header, null, col2Header, null].forEach(header => {
+    const th = document.createElement("th");
+    if (header) {
+      th.innerHTML = `${header.fr}${header.en ? `<br><span class="pair-th-en">${header.en}</span>` : ""}`;
+    }
+    headRow.appendChild(th);
+  });
+  table.appendChild(headRow);
+
+  pairs.forEach(([w1, w2, glossEn]) => {
+    const tr = document.createElement("tr");
+
+    const td1 = document.createElement("td");
+    td1.className = "pair-word";
+    td1.innerHTML = `${w1}${glossEn ? `<br><span class="pair-gloss">${glossEn}</span>` : ""}`;
+    const tdBtn1 = document.createElement("td");
+    tdBtn1.appendChild(makeSpeakBtn(w1, `Écouter ${w1}`));
+
+    const td2 = document.createElement("td");
+    td2.className = "pair-word";
+    td2.textContent = w2;
+    const tdBtn2 = document.createElement("td");
+    tdBtn2.appendChild(makeSpeakBtn(w2, `Écouter ${w2}`));
+
+    tr.appendChild(td1);
+    tr.appendChild(tdBtn1);
+    tr.appendChild(td2);
+    tr.appendChild(tdBtn2);
+    table.appendChild(tr);
+  });
+
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function renderParticipleLesson(container, lesson) {
+  container.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "participle-lesson-box";
+
+  const h = document.createElement("h4");
+  h.textContent = "Qu'est-ce qu'un participe passé ?";
+  box.appendChild(h);
+
+  const p = document.createElement("p");
+  p.textContent = lesson.intro;
+  box.appendChild(p);
+
+  box.appendChild(renderPairTable(lesson.pairs, { fr: "Infinitif", en: "infinitive" }, { fr: "Participe passé", en: "past participle" }));
+
+  if (lesson.helperExamples && lesson.helperExamples.length) {
+    const ruleP = document.createElement("p");
+    ruleP.className = "participle-rule";
+    ruleP.textContent = lesson.rule || "Passé composé = avoir (conjugué) + participe passé";
+    box.appendChild(ruleP);
+    box.appendChild(renderPairTable(lesson.helperExamples, { fr: "Auxiliaire", en: "helper" }, { fr: "Participe passé", en: "past participle" }));
+  }
+
+  if (lesson.examplePairs && lesson.examplePairs.length) {
+    const exWrap = document.createElement("div");
+    exWrap.className = "participle-examples";
+    lesson.examplePairs.forEach(([correct, incorrect]) => {
+      const okRow = document.createElement("div");
+      okRow.className = "participle-example correct";
+      const okSpan = document.createElement("span");
+      okSpan.textContent = `✅ ${correct}`;
+      okRow.appendChild(okSpan);
+      okRow.appendChild(makeSpeakBtn(correct, `Écouter : ${correct}`));
+      exWrap.appendChild(okRow);
+
+      const badRow = document.createElement("div");
+      badRow.className = "participle-example incorrect";
+      badRow.textContent = `❌ ${incorrect}`;
+      exWrap.appendChild(badRow);
+    });
+    box.appendChild(exWrap);
+  }
+
+  container.appendChild(box);
+}
+
 /* ---------- Rendering: Today ---------- */
 
 function renderToday() {
@@ -323,6 +471,19 @@ function renderToday() {
     details.appendChild(body);
     tablesEl.appendChild(details);
   });
+
+  // Past-participle concept lesson — only rendered on days that define one
+  // (currently 21, 22). Self-contained: creates/finds its own container and
+  // injects its own styles, so no HTML changes are required elsewhere.
+  ensureParticipleStyles();
+  const participleEl = ensureParticipleLessonContainer();
+  if (detail.participleLesson) {
+    renderParticipleLesson(participleEl, detail.participleLesson);
+    participleEl.style.display = "";
+  } else {
+    participleEl.innerHTML = "";
+    participleEl.style.display = "none";
+  }
 
   const notesEl = document.getElementById("day-notes");
   notesEl.value = getNotes(day);
