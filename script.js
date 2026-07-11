@@ -313,6 +313,7 @@ function renderToday() {
   document.getElementById("block-title").textContent = `${block.title} (jours ${block.range[0]}–${block.range[1]})`;
   document.getElementById("block-grammar").textContent = detail.grammar;
   document.getElementById("today-prompt").textContent = prompt;
+  document.getElementById("prompt-label").textContent = day < 21 ? "🎤 Today's Mission" : "🎤 Mission du jour";
   document.getElementById("streak-number").textContent = computeStreak();
   document.getElementById("jump-input").value = day;
   document.getElementById("today-main").style.setProperty("--block-color", block.color || "#2c5f8a");
@@ -378,10 +379,15 @@ function renderToday() {
   listeningHeading.style.display = listeningExamples.length ? "" : "none";
 
   // "Did you notice?" — a short cultural/grammatical insight for the day,
-  // shown only when one is defined.
+  // shown only when one is defined. Label is English for days 1–20 (extra
+  // scaffolding while the learner is still building foundations, same
+  // philosophy as the checklist's English subtext) and switches to French
+  // from Day 21 on, as immersion increases.
   const noticeEl = document.getElementById("today-notice");
   if (detail.didYouNotice) {
-    noticeEl.innerHTML = `<p class="notice-label">💡 Le sais-tu ?</p><p class="notice-text"></p>`;
+    const noticeLabel = day < 21 ? "💡 Did you know?" : "💡 Le sais-tu ?";
+    noticeEl.innerHTML = `<p class="notice-label"></p><p class="notice-text"></p>`;
+    noticeEl.querySelector(".notice-label").textContent = noticeLabel;
     noticeEl.querySelector(".notice-text").textContent = detail.didYouNotice;
     noticeEl.style.display = "";
   } else {
