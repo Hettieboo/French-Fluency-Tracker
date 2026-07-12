@@ -242,15 +242,28 @@ const BLOCKS = [
     ]
   },
   {
-    range: [56, 60],
+    range: [56, 57],
     color: "#c0392b",
-    title: "Consolidation & vraie conversation",
-    grammar: "Aucune nouvelle structure — intégration de tout",
+    title: "Bilan & histoire",
+    grammar: "Aucune nouvelle structure — intégration de tout + lecture des 5 chapitres",
     vocabFocus: "Tout le vocabulaire des blocs précédents",
     prompts: [
       "Enregistre un monologue de 2 minutes avec présent, passé composé, futur proche, et une formule au conditionnel.",
       "Vraie conversation de 10+ minutes sans anglais pendant les 5 premières minutes.",
       "Compare ton enregistrement du Jour 1 à aujourd'hui."
+    ]
+  },
+  {
+    range: [58, 70],
+    color: "#2E8B8B",
+    title: "Imparfait — décrire, comparer, raconter",
+    grammar: "Formation de l'imparfait (radical de « nous » au présent + -ais/-ais/-ait/-ions/-iez/-aient), être irrégulier, usages : description, habitude, action interrompue (imparfait + passé composé ensemble)",
+    vocabFocus: "Souvenirs, enfance, révision du vocabulaire des blocs 3 et 6",
+    prompts: [
+      "Décris une scène du passé à l'imparfait : le temps qu'il faisait, où tu étais, comment tu te sentais.",
+      "Quand tu étais enfant, qu'est-ce que tu faisais souvent ?",
+      "Raconte une interruption : « Je faisais X quand Y s'est passé. »",
+      "Relis un chapitre de l'histoire (Jour 56-57) et repère les verbes à l'imparfait."
     ]
   }
 ];
@@ -274,7 +287,13 @@ const CONJUGATIONS = {
   parlerEr: { title: "verbes en -er (modèle : parler)", rows: [["je", "parle"], ["tu", "parles"], ["il / elle / on", "parle"], ["nous", "parlons"], ["vous", "parlez"], ["ils / elles", "parlent"]] },
   impTu: { title: "impératif — forme « tu »", rows: [["(tu) →", "Viens !"], ["(tu) →", "Attends !"], ["(tu) →", "Dis-moi !"], ["(tu) →", "Fais !"]], note: "On enlève le pronom sujet. Pour les verbes en -er, on enlève aussi le « s » final (tu regardes → Regarde !)." },
   impNousVous: { title: "impératif — formes « nous/vous »", rows: [["(nous) →", "Allons-y !"], ["(vous) →", "Venez !"]] },
-  condChunks: { title: "Formes utiles au conditionnel (pas un tableau complet)", rows: [["je", "voudrais"], ["j'", "aimerais"], ["tu", "pourrais"], ["ça", "serait"]], note: "On apprend seulement ces formes comme blocs fixes, pas toute la conjugaison du conditionnel." }
+  condChunks: { title: "Formes utiles au conditionnel (pas un tableau complet)", rows: [["je", "voudrais"], ["j'", "aimerais"], ["tu", "pourrais"], ["ça", "serait"]], note: "On apprend seulement ces formes comme blocs fixes, pas toute la conjugaison du conditionnel." },
+  imparfaitTerminaisons: { title: "Terminaisons de l'imparfait (tous les verbes, sauf être)", rows: [["je", "-ais"], ["tu", "-ais"], ["il / elle / on", "-ait"], ["nous", "-ions"], ["vous", "-iez"], ["ils / elles", "-aient"]], note: "Radical = la forme « nous » du présent, sans -ons. Ex : nous parlons → parl-, nous finissons → finiss-, nous faisons → fais-." },
+  parlerImparfait: { title: "parler (imparfait)", rows: [["je", "parlais"], ["tu", "parlais"], ["il / elle / on", "parlait"], ["nous", "parlions"], ["vous", "parliez"], ["ils / elles", "parlaient"]] },
+  finirImparfait: { title: "finir (imparfait)", rows: [["je", "finissais"], ["tu", "finissais"], ["il / elle / on", "finissait"], ["nous", "finissions"], ["vous", "finissiez"], ["ils / elles", "finissaient"]] },
+  faireImparfait: { title: "faire (imparfait)", rows: [["je", "faisais"], ["tu", "faisais"], ["il / elle / on", "faisait"], ["nous", "faisions"], ["vous", "faisiez"], ["ils / elles", "faisaient"]], note: "Radical irrégulier à l'oral (fais-) mais les terminaisons restent régulières." },
+  avoirImparfait: { title: "avoir (imparfait)", rows: [["j'", "avais"], ["tu", "avais"], ["il / elle / on", "avait"], ["nous", "avions"], ["vous", "aviez"], ["ils / elles", "avaient"]] },
+  etreImparfait: { title: "être (imparfait)", rows: [["j'", "étais"], ["tu", "étais"], ["il / elle / on", "était"], ["nous", "étions"], ["vous", "étiez"], ["ils / elles", "étaient"]], note: "Seul radical vraiment irrégulier de l'imparfait : ét-. Les terminaisons, elles, restent les mêmes que pour tous les autres verbes." }
 };
 
 // Day-specific focus: what THIS day covers, as opposed to BLOCKS which describes
@@ -345,11 +364,29 @@ const DAY_DETAILS = {
   54: { grammar: "Désaccord & réparation : pas d'accord, ce n'est pas grave, on peut en parler", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.condChunks], prompt: "Pratique : « Je ne suis pas d'accord, mais... » suivi de « Ce n'est pas grave » ou « On peut en parler »." },
   55: { grammar: "Checkpoint du bloc : adoucis 3 demandes réelles + 1 désaccord", vocab: "Révision de tout le bloc 5", vocabWords: [], tables: [CONJUGATIONS.condChunks], prompt: "Adoucis trois demandes réelles et pratique un désaccord avec réparation." },
 
-  56: { grammar: "Aucune nouvelle structure — monologue intégrant présent, passé composé, futur proche, conditionnel", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Enregistre un monologue de deux minutes intégrant présent, passé composé, futur proche et une formule au conditionnel.", chapter: { n: 1, file: "chapter-1.html", title: "Un nouveau départ" } },
-  57: { grammar: "Vraie conversation de 10+ minutes, sans anglais pendant les 5 premières minutes", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Vraie conversation de dix minutes ou plus, sans anglais pendant les cinq premières minutes.", chapter: { n: 2, file: "chapter-2.html", title: "Dans la cuisine de Marie" } },
-  58: { grammar: "Compare ton enregistrement du Jour 20 à aujourd'hui", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Réécoute ton enregistrement du Jour 20 — qu'est-ce qui a changé depuis ?", chapter: { n: 3, file: "chapter-3.html", title: "Les courses" } },
-  59: { grammar: "Réparation ciblée des 3 points qui te bloquent encore", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Reprends les trois points qui te bloquent encore et entraîne-toi uniquement sur ceux-là.", chapter: { n: 4, file: "chapter-4.html", title: "Chez les grands-parents" } },
-  60: { grammar: "Monologue final + vraie conversation — compare au Jour 1", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Monologue final, puis vraie conversation — compare au tout premier jour.", chapter: { n: 5, file: null, title: "à venir" } }
+  56: { grammar: "Bilan (1/2) — monologue intégrant présent, passé composé, futur proche, conditionnel + réparation ciblée des points faibles", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Enregistre un monologue de deux minutes intégrant présent, passé composé, futur proche et une formule au conditionnel. Puis réécoute ton enregistrement du Jour 20 — qu'est-ce qui a changé depuis ? Reprends les trois points qui te bloquent encore.", chapters: [
+    { n: 1, file: "chapter-1.html", title: "Un nouveau départ" },
+    { n: 2, file: "chapter-2.html", title: "Dans la cuisine de Marie" },
+    { n: 3, file: "chapter-3.html", title: "Les courses" }
+  ] },
+  57: { grammar: "Bilan (2/2) — vraie conversation de 10+ minutes, sans anglais pendant les 5 premières minutes, puis monologue final comparé au Jour 1", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Vraie conversation de dix minutes ou plus, sans anglais pendant les cinq premières minutes. Puis un monologue final — compare-le au tout premier jour.", chapters: [
+    { n: 4, file: "chapter-4.html", title: "Chez les grands-parents" },
+    { n: 5, file: null, title: "à venir" }
+  ] },
+
+  58: { grammar: "Formation de l'imparfait — verbes en -er (radical de « nous » au présent + terminaisons)", vocab: "Souvenirs : enfance, autrefois, à l'époque", vocabWords: ["enfance", "autrefois", "à l'époque"], vocabExamples: [["Autrefois, je parlais moins.", "Before, I used to talk less."], ["À l'époque, tu habitais où ?", "Back then, where did you live?"], ["Dans mon enfance, on mangeait ensemble tous les soirs.", "In my childhood, we ate together every evening."]], didYouNotice: "L'imparfait se forme à partir du radical de « nous » au présent (nous parl-ons → parl-), jamais à partir de l'infinitif. Les terminaisons -ais/-ais/-ait/-ions/-iez/-aient sont les mêmes pour presque tous les verbes du français.", tables: [CONJUGATIONS.imparfaitTerminaisons, CONJUGATIONS.parlerImparfait], prompt: "Raconte trois choses que tu faisais souvent, à l'imparfait : « Je parlais... », « Tu habitais... »." },
+  59: { grammar: "Imparfait — verbes en -ir/-re et radical irrégulier à l'oral (faire → fais-)", vocab: "Habitudes : d'habitude, chaque jour, tout le temps", vocabWords: ["d'habitude", "chaque jour", "tout le temps"], vocabExamples: [["D'habitude, je finissais tôt.", "Usually, I used to finish early."], ["Chaque jour, tu faisais du sport.", "Every day, you used to exercise."], ["Tout le temps, on avait faim après l'école.", "All the time, we were hungry after school."]], tables: [CONJUGATIONS.imparfaitTerminaisons, CONJUGATIONS.finirImparfait, CONJUGATIONS.faireImparfait, CONJUGATIONS.avoirImparfait], prompt: "Utilise finir, faire et avoir à l'imparfait dans trois phrases sur tes habitudes d'avant." },
+  60: { grammar: "Imparfait irrégulier : être (ét-)", vocab: "Révision : émotions, descripteurs", vocabWords: [], vocabExamples: [["J'étais content(e) à l'époque.", "I was happy back then."], ["Tu étais jeune quand tu es arrivé(e) ici.", "You were young when you arrived here."], ["Nous étions toujours ensemble.", "We were always together."]], didYouNotice: "« être » est le seul verbe dont le radical de l'imparfait n'est pas prévisible (ét-, pas « êt- »). C'est pour ça qu'on l'apprend à part — une fois qu'on le connaît, tout le reste de l'imparfait suit la règle générale.", tables: [CONJUGATIONS.etreImparfait], prompt: "Décris comment tu étais il y a dix ans, en trois phrases avec être à l'imparfait." },
+  61: { grammar: "Usage 1 — décrire une scène du passé (temps, lieu, état physique/émotionnel)", vocab: "Météo : il faisait beau/froid/chaud, il pleuvait", vocabWords: ["il faisait beau/froid/chaud", "il pleuvait"], vocabExamples: [["Il faisait beau, et j'étais heureux.", "The weather was nice, and I was happy."], ["Il pleuvait, alors on restait à la maison.", "It was raining, so we stayed home."], ["C'était calme, tout le monde dormait encore.", "It was quiet, everyone was still asleep."]], tables: [CONJUGATIONS.etreImparfait, CONJUGATIONS.avoirImparfait], prompt: "Décris une scène du passé : le temps qu'il faisait, où tu étais, comment tu te sentais — tout à l'imparfait." },
+  62: { grammar: "Usage 2 — actions habituelles ou répétées dans le passé", vocab: "Fréquence au passé : souvent, toujours, tous les jours", vocabWords: [], vocabExamples: [["Quand j'étais petit(e), je jouais dehors tous les jours.", "When I was little, I played outside every day."], ["On allait chez mes grands-parents chaque dimanche.", "We used to go to my grandparents' every Sunday."], ["Tu prenais toujours le même chemin.", "You always used to take the same route."]], tables: [CONJUGATIONS.parlerImparfait, CONJUGATIONS.faireImparfait], prompt: "Quand tu étais enfant, qu'est-ce que tu faisais souvent ? Donne au moins trois habitudes à l'imparfait." },
+  63: { grammar: "Révision : formation + description + habitude", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.imparfaitTerminaisons, CONJUGATIONS.etreImparfait, CONJUGATIONS.avoirImparfait], prompt: "Décris ta vie il y a cinq ans : où tu habitais, ce que tu faisais d'habitude, comment tu étais." },
+  64: { grammar: "Usage 3 — action interrompue : imparfait (toile de fond) + passé composé (événement)", vocab: "quand, pendant que", vocabWords: ["quand", "pendant que"], vocabExamples: [["Je dormais quand le téléphone a sonné.", "I was sleeping when the phone rang."], ["On mangeait quand tu es arrivé(e).", "We were eating when you arrived."], ["Il faisait ses devoirs pendant que sa sœur regardait la télé.", "He was doing homework while his sister was watching TV."]], didYouNotice: "C'est le cœur du récit en français : l'imparfait plante le décor (ce qui était déjà en train de se passer), le passé composé apporte l'événement qui interrompt ou fait avancer l'histoire. Les deux travaillent toujours ensemble, jamais en compétition.", tables: [CONJUGATIONS.etreImparfait, { title: "Passé composé (rappel)", rows: CONJUGATIONS.avoir.rows }], prompt: "Raconte une interruption : « Je faisais X quand Y s'est passé. » Fais-en trois." },
+  65: { grammar: "Contraste intensif : passé composé vs imparfait", vocab: "Révision libre", vocabWords: [], vocabExamples: [["Hier, j'ai mangé à midi. (événement ponctuel)", "Yesterday, I ate at noon. (single event)"], ["Avant, je mangeais toujours à midi. (habitude)", "Before, I always used to eat at noon. (habit)"], ["Je lisais quand tu as appelé. (toile de fond + événement)", "I was reading when you called. (backdrop + event)"]], tables: [CONJUGATIONS.parlerImparfait], prompt: "Pour chaque phrase, choisis passé composé ou imparfait et justifie ton choix à voix haute — invente cinq exemples." },
+  66: { grammar: "Jour de parole : raconte un souvenir d'enfance", vocab: "Révision libre", vocabWords: [], tables: [], prompt: "Raconte un souvenir d'enfance en mélangeant imparfait (description, habitudes) et passé composé (ce qui s'est passé), une minute minimum." },
+  67: { grammar: "Jour de parole : relis un chapitre de l'histoire et repère l'imparfait", vocab: "Révision libre", vocabWords: [], tables: [], prompt: "Retourne aux Jours 56-57 et relis un des chapitres de l'histoire — repère tous les verbes à l'imparfait et dis pourquoi chacun est à l'imparfait et pas au passé composé." },
+  68: { grammar: "Révision des points faibles identifiés", vocab: "Révision libre", vocabWords: [], tables: [CONJUGATIONS.imparfaitTerminaisons, CONJUGATIONS.etreImparfait], prompt: "Reprends ce qui te bloque encore entre passé composé et imparfait, et répète-le trois fois." },
+  69: { grammar: "Mélange complet : présent, passé composé, imparfait, futur proche, conditionnel", vocab: "Révision générale", vocabWords: [], tables: [], prompt: "Enregistre un monologue de deux minutes en utilisant les cinq structures : présent, passé composé, imparfait, futur proche, conditionnel." },
+  70: { grammar: "Checkpoint du bloc : monologue de 3 minutes avec narration complète (imparfait + passé composé)", vocab: "Révision de tout le bloc 7", vocabWords: [], tables: [], prompt: "Enregistre un monologue de trois minutes racontant une histoire complète — plante le décor à l'imparfait, fais avancer l'action au passé composé." }
 };
 
 // Days where every table should render collapsed by default (heavy review days —

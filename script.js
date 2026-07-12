@@ -45,8 +45,12 @@ function getCurrentDay() {
   return parseInt(localStorage.getItem(STORAGE_KEYS.currentDay) || "1", 10);
 }
 
+function getTotalDays() {
+  return BLOCKS[BLOCKS.length - 1].range[1];
+}
+
 function setCurrentDay(day) {
-  const clamped = Math.min(60, Math.max(1, day));
+  const clamped = Math.min(getTotalDays(), Math.max(1, day));
   localStorage.setItem(STORAGE_KEYS.currentDay, String(clamped));
   return clamped;
 }
@@ -416,30 +420,32 @@ function renderToday() {
     noticeEl.style.display = "none";
   }
 
-  // Chapter banner (Days 56–60) — links out to the capstone story pages,
+  // Chapter banner (Days 56–57) — links out to the capstone story pages,
   // which run on their own self-contained engine (engine.js/engine.css).
+  // A day can list several chapters (detail.chapters, an array) so multiple
+  // story links can be consolidated onto a single day.
   const bannerEl = document.getElementById("chapter-banner");
   if (bannerEl) {
     bannerEl.innerHTML = "";
-    if (detail.chapter) {
-      const ch = detail.chapter;
+    const chapters = detail.chapters || (detail.chapter ? [detail.chapter] : []);
+    chapters.forEach(ch => {
       const banner = document.createElement("div");
       banner.className = "chapter-banner";
       if (ch.file) {
         banner.innerHTML = `
-          <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
+          <div class="chapter-banner-label">📖 Histoire — Chapitre ${ch.n}</div>
           <div class="chapter-banner-title">${ch.title}</div>
           <a class="chapter-banner-btn" href="${ch.file}" target="_blank">Lire le chapitre ${ch.n} →</a>
         `;
       } else {
         banner.innerHTML = `
-          <div class="chapter-banner-label">📖 Histoire du jour — Chapitre ${ch.n}</div>
+          <div class="chapter-banner-label">📖 Histoire — Chapitre ${ch.n}</div>
           <div class="chapter-banner-title chapter-coming">${ch.title}</div>
         `;
         banner.classList.add("chapter-banner--soon");
       }
       bannerEl.appendChild(banner);
-    }
+    });
   }
 
   // Conjugation tables — collapsible <details>, closed by default on heavy
@@ -646,7 +652,7 @@ function renderProgress() {
   const completed = getCompletedDays();
   const current = getCurrentDay();
 
-  for (let d = 1; d <= 60; d++) {
+  for (let d = 1; d <= getTotalDays(); d++) {
     const cell = document.createElement("div");
     cell.className = "day-cell";
     if (completed.has(d)) cell.classList.add("done");
