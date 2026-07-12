@@ -311,26 +311,27 @@ function renderToday() {
   const day = getCurrentDay();
   const block = getBlockForDay(day);
   const detail = DAY_DETAILS[day] || { grammar: block.grammar, vocab: block.vocabFocus, vocabWords: [], tables: [], prompt: block.prompts[0] };
-  const prompt = detail.prompt;
+
+  // Mission instructions render in English uniformly across every day —
+  // the French text (`prompt`) is what the learner practices saying, but
+  // the instruction telling them what to do is always in English, same
+  // label everywhere. No 🔊 button here since there's no French mission
+  // text on screen to pronounce (per-word/example audio elsewhere is
+  // unaffected).
+  const missionText = detail.promptEn || detail.prompt;
+  const isStoryDay = !!(detail.chapters && detail.chapters.length);
 
   document.getElementById("day-stamp").textContent = `Jour ${day}`;
   document.getElementById("block-title").textContent = `${block.title} (jours ${block.range[0]}–${block.range[1]})`;
   document.getElementById("block-grammar").textContent = detail.grammar;
-  document.getElementById("today-prompt").textContent = prompt;
-  document.getElementById("prompt-label").textContent = day < 21 ? "🎤 Today's Mission" : "🎤 Mission du jour";
+  document.getElementById("today-prompt").textContent = missionText;
+  document.getElementById("prompt-label").textContent = "🎤 Mission of the Day";
 
-  // English translation of the mission, shown under the French text for
-  // days 1–20 (matching the label). The 🔊 button still reads the French
-  // `prompt` text itself, so pronunciation stays correct regardless.
+  const speakPromptBtn = document.getElementById("speak-prompt");
+  if (speakPromptBtn) speakPromptBtn.style.display = "none";
+
   const existingPromptEn = document.getElementById("today-prompt-en");
   if (existingPromptEn) existingPromptEn.remove();
-  if (day < 21 && detail.promptEn) {
-    const promptEnEl = document.createElement("p");
-    promptEnEl.id = "today-prompt-en";
-    promptEnEl.className = "ex-en";
-    promptEnEl.textContent = detail.promptEn;
-    document.getElementById("today-prompt").insertAdjacentElement("afterend", promptEnEl);
-  }
 
   document.getElementById("streak-number").textContent = computeStreak();
   document.getElementById("jump-input").value = day;
@@ -397,23 +398,16 @@ function renderToday() {
   listeningHeading.style.display = listeningExamples.length ? "" : "none";
 
   // "Did you notice?" — a short cultural/grammatical insight for the day,
-  // shown only when one is defined. Label is English for days 1–20 (extra
-  // scaffolding while the learner is still building foundations, same
-  // philosophy as the checklist's English subtext) and switches to French
-  // from Day 21 on, as immersion increases.
+  // shown only when one is defined. Runs in English uniformly across every
+  // day (days 1–20 store the French original in didYouNotice and the
+  // English version in didYouNoticeEn — we show the English one; days 21+
+  // only ever had an English didYouNotice to begin with).
   const noticeEl = document.getElementById("today-notice");
   if (detail.didYouNotice) {
-    const noticeLabel = day < 21 ? "💡 Did you know?" : "💡 Le sais-tu ?";
+    const noticeText = detail.didYouNoticeEn || detail.didYouNotice;
     noticeEl.innerHTML = `<p class="notice-label"></p><p class="notice-text"></p>`;
-    noticeEl.querySelector(".notice-label").textContent = noticeLabel;
-    noticeEl.querySelector(".notice-text").textContent = detail.didYouNotice;
-    if (day < 21 && detail.didYouNoticeEn) {
-      const noticeEnEl = document.createElement("p");
-      noticeEnEl.className = "notice-text ex-en";
-      noticeEnEl.style.marginTop = "6px";
-      noticeEnEl.textContent = detail.didYouNoticeEn;
-      noticeEl.appendChild(noticeEnEl);
-    }
+    noticeEl.querySelector(".notice-label").textContent = "💡 Did you know?";
+    noticeEl.querySelector(".notice-text").textContent = noticeText;
     noticeEl.style.display = "";
   } else {
     noticeEl.innerHTML = "";
@@ -518,43 +512,74 @@ function renderToday() {
     participleEl.style.display = "none";
   }
 
+  // Story-capstone days (currently 69–70) test comprehension/fluency rather
+  // than working through a graded session — no checklist/heading, and the
+  // notes box asks for a story summary instead of free notes.
   const notesEl = document.getElementById("day-notes");
   notesEl.value = getNotes(day);
   notesEl.oninput = () => setNotes(day, notesEl.value);
+  notesEl.placeholder = isStoryDay
+    ? "Summarize the story in your own words, or note the lessons you're taking from it..."
+    : "Écris ta réponse à la question du jour, ou prends des notes ici...";
+
+  const notesHeadingFr = document.getElementById("notes-heading-fr");
+  const notesHeadingEn = document.getElementById("notes-heading-en");
+  if (notesHeadingFr && notesHeadingEn) {
+    if (isStoryDay) {
+      notesHeadingFr.textContent = "Résumé de l'histoire";
+      notesHeadingEn.textContent = "Story summary";
+    } else {
+      notesHeadingFr.textContent = "Tes notes / ta réponse du jour";
+      notesHeadingEn.textContent = "Your notes / today's answer";
+    }
+  }
+
+  const sessionHeadingEl = document.getElementById("session-heading");
+  if (sessionHeadingEl) sessionHeadingEl.style.display = isStoryDay ? "none" : "";
 
   const checklistEl = document.getElementById("session-checklist");
-  const savedState = getChecklistState(day);
-  checklistEl.innerHTML = "";
-  SESSION_TEMPLATE.forEach(([fr, en], i) => {
-    const li = document.createElement("li");
-    if (savedState[i]) li.classList.add("step-done");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = !!savedState[i];
-    checkbox.addEventListener("change", () => {
-      const state = getChecklistState(day);
-      state[i] = checkbox.checked;
-      setChecklistState(day, state);
-      li.classList.toggle("step-done", checkbox.checked);
-      updateChecklistProgress(day);
-    });
-    const textWrap = document.createElement("span");
-    textWrap.className = "checklist-text";
-    const frSpan = document.createElement("span");
-    frSpan.className = "checklist-fr";
-    frSpan.textContent = fr;
-    const enSpan = document.createElement("span");
-    enSpan.className = "checklist-en";
-    enSpan.textContent = en;
-    textWrap.appendChild(frSpan);
-    textWrap.appendChild(enSpan);
-    li.appendChild(checkbox);
-    li.appendChild(textWrap);
-    checklistEl.appendChild(li);
-  });
-  updateChecklistProgress(day);
+  const checklistProgressEl = document.getElementById("checklist-progress");
 
-  document.getElementById("speak-prompt").onclick = () => speak(prompt);
+  if (isStoryDay) {
+    checklistEl.innerHTML = "";
+    checklistEl.style.display = "none";
+    if (checklistProgressEl) checklistProgressEl.style.display = "none";
+  } else {
+    checklistEl.style.display = "";
+    if (checklistProgressEl) checklistProgressEl.style.display = "";
+    const savedState = getChecklistState(day);
+    checklistEl.innerHTML = "";
+    SESSION_TEMPLATE.forEach(([fr, en], i) => {
+      const li = document.createElement("li");
+      if (savedState[i]) li.classList.add("step-done");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = !!savedState[i];
+      checkbox.addEventListener("change", () => {
+        const state = getChecklistState(day);
+        state[i] = checkbox.checked;
+        setChecklistState(day, state);
+        li.classList.toggle("step-done", checkbox.checked);
+        updateChecklistProgress(day);
+      });
+      const textWrap = document.createElement("span");
+      textWrap.className = "checklist-text";
+      const frSpan = document.createElement("span");
+      frSpan.className = "checklist-fr";
+      frSpan.textContent = fr;
+      const enSpan = document.createElement("span");
+      enSpan.className = "checklist-en";
+      enSpan.textContent = en;
+      textWrap.appendChild(frSpan);
+      textWrap.appendChild(enSpan);
+      li.appendChild(checkbox);
+      li.appendChild(textWrap);
+      checklistEl.appendChild(li);
+    });
+    updateChecklistProgress(day);
+  }
+
+  document.getElementById("speak-prompt").onclick = () => speak(detail.prompt);
 }
 
 /* ---------- Rendering: Vocabulary ---------- */

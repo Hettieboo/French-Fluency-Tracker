@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google" content="notranslate">
-<title>French Learning App — 60 jours de français</title>
+<title>French Learning App — 70 jours de français</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,72,400;0,72,600;1,72,500&family=Inter:wght@400;500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
 
   <header class="page-header">
     <p class="eyebrow">french learning app</p>
-    <h1>60 jours de français</h1>
+    <h1>70 jours de français</h1>
     <p class="subtitle">Apprends à parler naturellement avec ta famille. Pas pour un examen. Pour la vraie vie.</p>
   </header>
 
@@ -63,13 +63,13 @@
 
           <div id="chapter-banner"></div>
 
-          <h3>
+          <h3 id="session-heading">
             Séance du jour<span class="subhead-en">Today's session</span> (20–28 min)
             <span class="checklist-progress" id="checklist-progress">0/4</span>
           </h3>
           <ul class="checklist" id="session-checklist"></ul>
 
-          <h3>Tes notes / ta réponse du jour<span class="subhead-en">Your notes / today's answer</span></h3>
+          <h3><span id="notes-heading-fr">Tes notes / ta réponse du jour</span><span class="subhead-en" id="notes-heading-en">Your notes / today's answer</span></h3>
           <textarea id="day-notes" class="notes-pad" placeholder="Écris ta réponse à la question du jour, ou prends des notes ici..."></textarea>
 
           <div class="day-controls">
@@ -78,7 +78,7 @@
               <summary>Aller à un autre jour</summary>
               <div class="day-jump-inner">
                 <label for="jump-input">Jour</label>
-                <input type="number" id="jump-input" min="1" max="60" value="1">
+                <input type="number" id="jump-input" min="1" max="70" value="1">
                 <button id="jump-btn">OK</button>
               </div>
             </details>
@@ -111,7 +111,7 @@
     </section>
 
     <section id="progress" class="panel">
-      <h2>Les 60 jours</h2>
+      <h2>Les 70 jours</h2>
       <div class="grid-60" id="grid-60"></div>
       <button class="reset-btn" id="reset-btn">Réinitialiser la progression</button>
     </section>
